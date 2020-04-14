@@ -2,6 +2,7 @@
   "name": "my-react-scaffold",
   "version": "0.1.0",
   "private": true,
+  "proxy" : "http://10.76.2.232:8000",
   "dependencies": {
     "antd": "^4.0.1",
     "axios": "^0.19.2",

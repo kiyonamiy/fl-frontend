@@ -5,7 +5,7 @@ import { GET_PERFORMANCE, GET_PERFORMANCE_ERROR, BEGIN_GET_PERFORMANCE } from '.
 // worker saga
 function* showPerformanceAsync(action) {
   try {
-    const response = yield call(axios.get, 'http://10.76.2.232:8000/performance/?round=500&number=5');
+    const response = yield call(axios.get, '/performance/?round=500&number=5');
     yield put(GET_PERFORMANCE(response.data));
   } catch(e) {
     yield put(GET_PERFORMANCE_ERROR(e));
