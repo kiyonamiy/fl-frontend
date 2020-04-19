@@ -1,9 +1,8 @@
 /* eslint-disable radix */
 import React from "react";
 import { connect } from 'react-redux';
-import {Begin_GET_PERFORMANCE} from '../store/action';
 import * as d3 from "d3";
-import '../../../../assets/css/client/server-client.css'
+import '../../assets/css/client/server-client.css'
 
 
 
@@ -14,11 +13,6 @@ class ServerClient extends React.Component{
     this.state = {
       performance: {}
     };
-  }
-
-  componentDidMount(){
-    this.props.dispatch(Begin_GET_PERFORMANCE());
-
   }
 
   render() {
@@ -249,7 +243,7 @@ class ServerClient extends React.Component{
 
 
 const mapStateToProps  = (state) => ({
-  performance: state.clientView.performance
+  performance: state.Client.test
 });
 
 export default connect(mapStateToProps)(ServerClient);

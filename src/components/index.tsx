@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../assets/css/frame.css'
+import '../assets/css/frame.css'
 import BoxPlot from './client/box-plot';
 import ServerClient from './client/server-client';
 import { BarChartPane } from './client/bar-chart';

@@ -8,13 +8,14 @@ export interface ModelRes {
 export interface ClientRes {
     train: ModelRes,
     test: ModelRes,
-    id: number
+    id: number,
+    round: number
 };
 
 // 某一轮所有客户端的结果
 export interface RoundRes {
     round: number,
-    clinets: ClientRes[]
+    clients: ClientRes[]
 }
 
 export type Performance = RoundRes[];
@@ -22,11 +23,13 @@ export type Performance = RoundRes[];
 export type Client = {
     fetched: boolean,
     performance: Performance,
+    test: any,
     error: object
 };
 
 export const DEFAULT_CLIENTS: Client = {
     fetched: false,
     performance: [],
+    test: {},
     error: {}
 };

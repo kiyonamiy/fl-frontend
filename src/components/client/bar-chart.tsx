@@ -1,18 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { connect } from 'react-redux';
 import * as d3 from 'd3';
-import '../../../../assets/css/client/bar-chart.css'
+import '../../assets/css/client/bar-chart.css'
 import { Performance, State } from "../../types";
 import { createDispatchHandler, ActionHandler } from "../../actions/redux-action";
 import { ClientAction, BEGIN_GET_PERFORMANCE } from "../../actions";
-
-
 
 export interface BarChartProps extends ActionHandler<ClientAction> {
   performance: Performance
 };
 function BarChart(props: BarChartProps): JSX.Element {
-  const [performance, setPerformance] = useState({});
   useEffect(() => {
     props.handleAction({
       type: BEGIN_GET_PERFORMANCE,
@@ -22,32 +19,8 @@ function BarChart(props: BarChartProps): JSX.Element {
       }
     })
   }, []);
-  const getData = (performance: Performance): void => {
-    let res = [];
-    for(let r in performance){
-      if(performance.hasOwnProperty(r)){
-        let thisRound = performance[r];
-        let round = {round: r, clients:[]};
-        for(let c in thisRound['train']){
-          if(thisRound['train'].hasOwnProperty(c)){
-            let client = {
-              id: c,
-              round: r,
-              trainAuc: thisRound['train'][c].accuracy,
-              trainLoss: thisRound['train'][c].loss,
-              testAuc: thisRound['test'][c].accuracy,
-              testLoss:thisRound['test'][c].loss
-            }
-            round.clients.push(client);
-          }
-        }
-        res.push(round);
-      }
-    }
-    return res
-  }
 
-  createBarChart(data){
+  const createBarChart = (data: Performance): void => {
 
     if(data.length === 0){
       return
@@ -77,12 +50,8 @@ function BarChart(props: BarChartProps): JSX.Element {
     // add bar charts
     const barBound = {width: 0.7 * textWidth, height: 80};
     const barPadding = 20;
-    const container = d3.select("#ClientView")
-      .append('Div')
-      .attr('id', 'BarContainer');
-
-    const barSvg = container.append('svg')
-      .attr('id', 'BarSvg');
+    const barSvg = d3.select('#BarSvg');
+    barSvg.selectAll('g').remove();
 
     const gRound = barSvg.selectAll('g')
       .data(data)
@@ -102,27 +71,31 @@ function BarChart(props: BarChartProps): JSX.Element {
       .domain(group)
       .rangeRound([0, barBound.height])
       .paddingInner(0.1);
-
+    
     let y = d3.scaleBand()
-      .domain([0,1])
+      .domain(['0', '1'])
       .rangeRound([0, yGroup.bandwidth()])
       .padding(0.05);
-
+    
+    const xAucMax = Math.max(...data.map(d => 
+      Math.max(...d.clients.map(c => Math.max(c.train.accuracy, c.test.accuracy)))));
     let xAuc = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d3.max(d.clients, c => d3.max([c.trainAuc, c.testAuc])))]).nice()
+      .domain([0, xAucMax]).nice()
       .rangeRound([0,barBound.width]);
-
+    
+    const xLossMax = Math.max(...data.map(d => 
+      Math.max(...d.clients.map(c => Math.max(c.train.loss, c.test.loss)))));
     let xLoss = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d3.max(d.clients, c => d3.max([c.trainLoss, c.testLoss])))]).nice()
+      .domain([0, xLossMax]).nice()
       .rangeRound([0,barBound.width]);
 
-    group.forEach(g => {
+    group.forEach((g, index) => {
       const gRect = gClient.append('g')
-        .attr('id', d => d.id + d.round)
+        .attr('id', d => d.id + '-' + d.round)
         .attr('transform', 'translate(0,' + yGroup(g) + ')');
 
       gRect.selectAll('rect')
-        .data(d => {return [d['train' + g], d['test' + g]]})
+        .data(d => {return index == 0 ? [d.train.accuracy, d.test.accuracy] : [d.train.loss, d.test.loss]})
         .join('rect')
         .attr('class', (d, i) => {
           if(i === 0){
@@ -134,8 +107,9 @@ function BarChart(props: BarChartProps): JSX.Element {
           }
         })
         .attr("x", 0)
+        // @ts-ignore
         .attr("y", (d, i) => y(i))
-        .attr("width", d => {
+        .attr("width", (d: number) => {
           if(g === 'Auc'){
             return xAuc(d) - xAuc(0)
           }else if(g === 'Loss'){
@@ -151,9 +125,10 @@ function BarChart(props: BarChartProps): JSX.Element {
         .join('text')
         .text(d => d.name)
         .attr('class', d => {
-          return 'RectText Text' + d.id + d.round
+          return 'RectText Text' + d.id + '-' + d.round
         })
         .attr('x', 2)
+        // @ts-ignore
         .attr('y',(d, i) => {return y.bandwidth() * 0.7 + y(i)});
 
       gRect.on('mouseover', function() {
@@ -168,16 +143,16 @@ function BarChart(props: BarChartProps): JSX.Element {
     });
   }
 
-    let data = this.getData(this.props.performance);
-    console.log(data);
-    this.createBarChart(data);
-    return null;
+  createBarChart(props.performance);
+  console.log(props.performance);
+  return (
+    <div id='BarContainer'>
+      <svg id='BarSvg'>
+
+      </svg>
+    </div>
+  );
 }
-
-
-const mapStateToProps  = (state: State) => ({
-  performance: state.Client.performance
-});
 
 export const BarChartPane = connect(
   (state: State) => ({

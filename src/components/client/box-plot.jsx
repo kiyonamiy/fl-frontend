@@ -1,9 +1,8 @@
 /* eslint-disable radix */
 import React from "react";
 import { connect } from 'react-redux';
-import {Begin_GET_PERFORMANCE} from '../store/action';
 import * as d3 from "d3";
-import '../../../../assets/css/client/box-plot.css'
+import '../../assets/css/client/box-plot.css'
 
 
 class BoxPlot extends React.Component{
@@ -13,11 +12,6 @@ class BoxPlot extends React.Component{
     this.state = {
       performance: {}
     };
-  }
-
-  componentDidMount(){
-    this.props.dispatch(Begin_GET_PERFORMANCE());
-
   }
 
   render() {
@@ -280,7 +274,7 @@ class BoxPlot extends React.Component{
 
 
 const mapStateToProps  = (state) => ({
-  performance: state.clientView.performance
+  performance: state.Client.test
 });
 
 export default connect(mapStateToProps)(BoxPlot);

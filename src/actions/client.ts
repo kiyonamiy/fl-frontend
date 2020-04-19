@@ -11,7 +11,8 @@ export type BeginGetPerformance = ReduxAction<typeof BEGIN_GET_PERFORMANCE, {
 
 export const GET_PERFORMANCE = 'GET_PERFORMANCE';
 export type GetPerformance = ReduxAction<typeof GET_PERFORMANCE, {
-  performance: Performance
+  performance: Performance,
+  test: any
 }>;
 
 export const GET_PERFORMANCE_ERROR = 'GET_PERFORMANCE_ERROR';
