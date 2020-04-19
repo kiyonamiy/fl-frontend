@@ -1,33 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from 'react-redux';
-import {Begin_GET_PERFORMANCE} from '../store/action';
-import * as d3 from "d3";
+import * as d3 from 'd3';
 import '../../../../assets/css/client/bar-chart.css'
+import { Performance, State } from "../../types";
+import { createDispatchHandler, ActionHandler } from "../../actions/redux-action";
+import { ClientAction, BEGIN_GET_PERFORMANCE } from "../../actions";
 
 
 
-class BarChart extends React.Component{
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      performance: {}
-    };
-  }
-
-  componentDidMount(){
-    this.props.dispatch(Begin_GET_PERFORMANCE());
-
-  }
-
-  render() {
-    let data = this.getData(this.props.performance);
-    console.log(data);
-    this.createBarChart(data);
-    return null
-  }
-
-  getData(performance){
+export interface BarChartProps extends ActionHandler<ClientAction> {
+  performance: Performance
+};
+function BarChart(props: BarChartProps): JSX.Element {
+  const [performance, setPerformance] = useState({});
+  useEffect(() => {
+    props.handleAction({
+      type: BEGIN_GET_PERFORMANCE,
+      payload: {
+        round: 495,
+        number: 5
+      }
+    })
+  }, []);
+  const getData = (performance: Performance): void => {
     let res = [];
     for(let r in performance){
       if(performance.hasOwnProperty(r)){
@@ -171,16 +166,22 @@ class BarChart extends React.Component{
             .style('display', 'none');
         })
     });
-
-
-
   }
 
+    let data = this.getData(this.props.performance);
+    console.log(data);
+    this.createBarChart(data);
+    return null;
 }
 
 
-const mapStateToProps  = (state) => ({
-  performance: state.clientView.performance
+const mapStateToProps  = (state: State) => ({
+  performance: state.Client.performance
 });
 
-export default connect(mapStateToProps)(BarChart);
+export const BarChartPane = connect(
+  (state: State) => ({
+    performance: state.Client.performance
+  }),
+  createDispatchHandler<ClientAction>()
+)(BarChart);

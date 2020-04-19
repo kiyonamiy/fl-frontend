@@ -1,17 +1,18 @@
 import React from 'react';
 import '../../assets/css/frame.css'
-import BoxPlot from "./client/components/box-plot";
-import ServerClient from "./client/components/server-client";
-import BarChart from "./client/components/bar-chart";
+import BoxPlot from './client/box-plot';
+import ServerClient from './client/server-client';
+import { BarChartPane } from './client/bar-chart';
 
 
-export default function Home(): JSX.Element {
+
+export default function AppPane(): JSX.Element {
   return (
     <div>
       <div className='Frame ClientView' id='ClientView'>
-        <BoxPlot></BoxPlot>
-        <ServerClient></ServerClient>
-        <BarChart></BarChart>
+        <BoxPlot />
+        <ServerClient />
+        <BarChartPane />
       </div>
       <div className='Frame SpaceView'>Space</div>
       <div className='Frame ModelView'>Model</div>

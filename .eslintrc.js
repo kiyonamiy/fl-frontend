@@ -20,6 +20,8 @@ module.exports = {
     eqeqeq: ['warn', 'allow-null'],
     'spaced-comment': 0,
     '@typescript-eslint/no-var-requires': 0,
-    '@typescript-eslint/explicit-member-accessibility': 0
+    '@typescript-eslint/explicit-member-accessibility': 0,
+    'max-params': 0,
+    'one-var': 0
   }
 };

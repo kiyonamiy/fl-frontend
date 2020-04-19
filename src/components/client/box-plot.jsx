@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 import React from "react";
 import { connect } from 'react-redux';
 import {Begin_GET_PERFORMANCE} from '../store/action';

@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 import React from "react";
 import { connect } from 'react-redux';
 import {Begin_GET_PERFORMANCE} from '../store/action';
@@ -118,8 +119,8 @@ class ServerClient extends React.Component{
       });
 
     // add circles in client rects
-    const minRound = d3.min(clients, function(d){return d.rounds[0];}),
-      maxRound = d3.max(clients, function(d){return d.rounds[d.rounds.length - 1];});
+    const minRound = d3.min(clients, function(d){return d.rounds[0];});
+    const maxRound = d3.max(clients, function(d){return d.rounds[d.rounds.length - 1];});
 
     const xCircle = d3.scaleLinear()
       .domain([minRound, maxRound])
