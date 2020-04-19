@@ -2,7 +2,7 @@
   "name": "my-react-scaffold",
   "version": "0.1.0",
   "private": true,
-  "proxy" : "http://10.76.2.232:8000",
+  "proxy": "http://10.76.2.232:8000",
   "dependencies": {
     "antd": "^4.0.1",
     "axios": "^0.19.2",
@@ -17,6 +17,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.2.0",
     "redux": "^4.0.5",
+    "redux-devtools-extension": "^2.13.8",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
     "redux-saga": "^1.1.3",
