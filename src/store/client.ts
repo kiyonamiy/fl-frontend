@@ -9,10 +9,8 @@ export const clientReducer = (state: Client = DEFAULT_CLIENTS, action: ClientAct
     case GET_PERFORMANCE: {
       return {...state, fetched: true, performance: action.payload.performance, test: action.payload.test};
     }
-    default: {
-      console.log('No action match.')
-    }
+    default:
+      return state;
   }
-  return state;
 };
 
