@@ -5,6 +5,8 @@
   "proxy": "http://10.76.2.232:8000",
   "dependencies": {
     "@types/d3": "^5.7.2",
+    "@types/jquery": "^3.3.38",
+    "@types/qs": "^6.9.2",
     "antd": "^4.0.1",
     "axios": "^0.19.2",
     "customize-cra": "^0.9.1",

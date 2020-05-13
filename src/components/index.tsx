@@ -3,6 +3,7 @@ import '../assets/css/frame.css'
 import BoxPlot from './client/box-plot';
 import ServerClient from './client/server-client';
 import { BarChartPane } from './client/bar-chart';
+import { SpacePane } from './space';
 
 
 
@@ -14,7 +15,7 @@ export default function AppPane(): JSX.Element {
         <ServerClient />
         <BarChartPane />
       </div>
-      <div className='Frame SpaceView'>Space</div>
+      <SpacePane></SpacePane>
       <div className='Frame ModelView'>Model</div>
       <div className='Frame GradientView'>Gradient</div>
     </div>

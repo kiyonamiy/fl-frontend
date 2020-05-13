@@ -1,8 +1,10 @@
-import { Space, DEFAULTE_SPACE } from "../types";
-import { Action } from "redux";
+import { Space, DEFAULT_SPACE } from "../types";
+import { SET_SPACE_ROUND, SpaceAction, SET_ANOMALY_SPACE } from "../actions";
 
-export const spaceReducer = (state: Space = DEFAULTE_SPACE, action: Action): Space => {
+export const spaceReducer = (state: Space = DEFAULT_SPACE, action: SpaceAction): Space => {
     switch (action.type) {
+        case SET_ANOMALY_SPACE:
+            return {...state, anomaly: action.payload.anomaly};
         default: 
             return state;
     }
