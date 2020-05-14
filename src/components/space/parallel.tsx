@@ -37,13 +37,14 @@ function ParallelPaneBase(props: ParallelProps): JSX.Element {
     height = 250 - margin.top - margin.bottom;
 
     // append the svg object to the body of the page
-    const svg = d3.select(`#parallel-${props.id}`)
-    .attr('width', width + margin.left + margin.right)
-    .attr('height', height + margin.top + margin.bottom)
-    .append('g')
-    .attr('transform',
-          'translate(' + margin.left + ',' + margin.top + ')');
-    svg.selectAll('*').remove();
+    const svg = d3.select(`#parallel-${props.id}`);
+    svg.selectAll('g').remove();
+    const g = svg
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+      .append('g')
+      .attr('transform',
+            'translate(' + margin.left + ',' + margin.top + ')');
 
     const dimensions = metrics.map((v,i) => '' + i).filter((v,i) => curMetrics[i] === true);
     // For each dimension, I build a linear scale. I store all in a y object
@@ -65,7 +66,7 @@ function ParallelPaneBase(props: ParallelProps): JSX.Element {
     }
 
     // Draw the lines
-    svg
+    g
       .selectAll('myPath')
       .data(props.data.value)
       .enter().append('path')
@@ -76,7 +77,7 @@ function ParallelPaneBase(props: ParallelProps): JSX.Element {
       .style('opacity', 0.5);
 
     // Draw the axis:
-    svg.selectAll('myAxis')
+    g.selectAll('myAxis')
       // For each dimension of the dataset I add a 'g' element:
       .data(dimensions).enter()
       .append('g')
@@ -91,7 +92,7 @@ function ParallelPaneBase(props: ParallelProps): JSX.Element {
         .text(d => metrics[+d])
         .style('fill', 'black')
 
-  }, [props.data]);
+  }, [props.data, curMetrics]);
 
   return (  
     <div className='parallel-view'>
