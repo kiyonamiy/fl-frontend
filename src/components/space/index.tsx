@@ -6,6 +6,7 @@ import { SpaceAction, SET_SPACE_ROUND } from '../../actions';
 import { ParallelPane } from './parallel';
 
 import './space.css';
+import { ProjectionPane } from './projection';
 export interface SpaceProps extends ActionHandler<SpaceAction> {
   curRound: number,
   space: Space
@@ -29,6 +30,11 @@ function SpacePaneBase(props: SpaceProps): JSX.Element {
           data={props.space.contribution}
           width={250}
           color='#69b3a2'
+        />
+        <ProjectionPane
+          data={props.space.concat}
+          anomalyFilter={props.space.anomalyFilter}
+          contributionFilter={props.space.contributionFilter}
         />
         <ParallelPane 
           title='Anomaly Space'

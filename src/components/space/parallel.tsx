@@ -5,8 +5,10 @@ import { State, Parallel, MetricValue } from '../../types';
 import { Select, OptionProps } from '../utils/select';
 
 import './parallel.css';
+import { ActionHandler, createDispatchHandler } from '../../actions/redux-action';
+import { SpaceAction, SET_ANOMALY_FILTER, SET_CONTRIBUTION_FILTER } from '../../actions';
 
-export interface ParallelProps {
+export interface ParallelProps extends ActionHandler<SpaceAction> {
   title: string,
   id: 'contribution' | 'anomaly',
   data: Parallel,
@@ -28,6 +30,12 @@ function ParallelPaneBase(props: ParallelProps): JSX.Element {
     const newCurMetrics = curMetrics.concat();
     newCurMetrics[index] = !newCurMetrics[index];
     setcurMetrics(newCurMetrics);
+    props.handleAction({
+      type: props.id == 'anomaly' ? SET_ANOMALY_FILTER : SET_CONTRIBUTION_FILTER,
+      payload: {
+        filter: curMetrics
+      }
+    })
   };
 
   useEffect(() => {
@@ -122,5 +130,5 @@ const mapStateToProps = (state: State) => ({
 });
 export const ParallelPane = connect(
   mapStateToProps,
-  null
+  createDispatchHandler<SpaceAction>()
 )(ParallelPaneBase);

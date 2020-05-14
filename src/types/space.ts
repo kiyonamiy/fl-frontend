@@ -26,7 +26,9 @@ export type Space = {
     clients: number[],
     anomaly: Parallel,
     contribution: Parallel,
-    concat: MetricValue[]
+    concat: MetricValue[],
+    anomalyFilter: boolean[],
+    contributionFilter: boolean[]
 };
 
 export const DEFAULT_SPACE: Space = {
@@ -41,5 +43,7 @@ export const DEFAULT_SPACE: Space = {
         scale: DEFAULT_CONTRIBUTION_SCALE,
         value: []
     },
-    concat: []
+    concat: [],
+    anomalyFilter: [true, true, true, true, true, true],
+    contributionFilter: [true, true, true, true]
 };

@@ -1,8 +1,9 @@
 import { call, put, all, takeLatest, select } from 'redux-saga/effects';
-import { SET_SPACE_ROUND, SetSpaceRound, SetAnomalySpace, SET_ANOMALY_SPACE, SetContributionSpace, SET_CONTRIBUTION_SPACE } from '../space';
+import { SET_SPACE_ROUND, SetSpaceRound, SetAnomalySpace, SET_ANOMALY_SPACE, SetContributionSpace, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE } from '../space';
 import { getKrum, getFoolsGold, getZeno, getAuror, getSniper, getPca, getContributionGrad, getContributionPerformance } from '../../api';
 import { getLayers, getClientNum, getRound } from '../../components/utils/selector';
-import { Parallel, DEFAULT_ANOMALY_METRICS, DEFAULT_CONTRIBUTION_METRICS, DEFAULT_ANOMALY_SCALE, DEFAULT_CONTRIBUTION_SCALE } from '../../types';
+import { Parallel, DEFAULT_ANOMALY_METRICS, DEFAULT_CONTRIBUTION_METRICS, DEFAULT_ANOMALY_SCALE, DEFAULT_CONTRIBUTION_SCALE, MetricValue } from '../../types';
+import { deepClone } from '../../components/utils/deepclone';
 
 const transferData = (spaceRes: any, metrics: string[], scale: number[][], clientNum: number): Parallel => {
     const res: Parallel = {
@@ -23,6 +24,14 @@ const transferData = (spaceRes: any, metrics: string[], scale: number[][], clien
     });
     return res;
 }
+
+const mergeVector = (anomalyData: Parallel, contributionData: Parallel): MetricValue[] => {
+    const res = deepClone<MetricValue[]>(anomalyData.value);
+    contributionData.value.forEach((d,i) => {
+      res[i].vector.push(...d.vector);
+    });
+    return res;
+};
 function* requestSpace(action: SetSpaceRound): any {
     const layers: string[] = yield select(getLayers);
     const clientNum = yield select(getClientNum);
@@ -39,9 +48,8 @@ function* requestSpace(action: SetSpaceRound): any {
         call(getContributionPerformance, {round: round}),
         call(getContributionPerformance, {metric: 'loss', round: round}),
     ]);
-    const anomalyRes: Parallel = transferData(spaceResult.slice(0, 6), DEFAULT_ANOMALY_METRICS, DEFAULT_ANOMALY_SCALE, clientNum);
-    const contributionRes: Parallel = transferData(spaceResult.slice(6, 10), DEFAULT_CONTRIBUTION_METRICS, DEFAULT_CONTRIBUTION_SCALE, clientNum);;
-    const anomalyAction: SetAnomalySpace = {
+    const anomalyRes = transferData(spaceResult.slice(0, 6), DEFAULT_ANOMALY_METRICS, DEFAULT_ANOMALY_SCALE, clientNum);
+    const anomalyAction = {
         type: SET_ANOMALY_SPACE,
         payload: {
             anomaly: anomalyRes
@@ -49,13 +57,23 @@ function* requestSpace(action: SetSpaceRound): any {
     };
     yield put(anomalyAction);
 
-    const contributionAction: SetContributionSpace = {
+    const contributionRes = transferData(spaceResult.slice(6, 10), DEFAULT_CONTRIBUTION_METRICS, DEFAULT_CONTRIBUTION_SCALE, clientNum);;
+    const contributionAction = {
         type: SET_CONTRIBUTION_SPACE,
         payload: {
             contribution: contributionRes
         }
     };
     yield put(contributionAction);
+
+    const concatRes = mergeVector(anomalyRes, contributionRes);
+    const concatAction = {
+      type: SET_CONCAT_SPACE,
+      payload: {
+        concat: concatRes
+      }
+    };
+    yield put(concatAction);
 }
 // wacther saga
 export function* watchSetSpaceRound() {
