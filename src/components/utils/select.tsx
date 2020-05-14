@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import './select.css';
 
 export interface Style {
-    width?: string,
+    width?: number,
     height?: string,
     top?: string,
     fontWeight?: number
@@ -17,8 +17,9 @@ interface SelectProps {
     style: Style,
     title: string,
     options: OptionProps[],
-    selected: Boolean[],
-    btnClick: Function
+    selected: boolean[],
+    checkBox: boolean,
+    btnClick: Function,
 };
 export function Select(props: SelectProps): JSX.Element {
     const {style, selected, options, title} = props;
@@ -26,8 +27,13 @@ export function Select(props: SelectProps): JSX.Element {
     const normalContent = options.map((v, i) =>
       <div 
           key={`option-content-${i}`} 
-          className={'select-option' + (selected[i] == true  ? ' select-option-checked' : '')}
-          onClick={(): void => {props.btnClick(v.value); selectBtn();}}>
+          className={'select-option' + (selected[i] === true && props.checkBox === false  ? ' select-option-checked' : '')}
+          onClick={(): void => {props.btnClick(v.value); if (props.checkBox === false) selectBtn();}}>
+          {props.checkBox ? 
+            <input type='checkbox' checked={selected[i] === true} readOnly></input>
+            :
+            null
+          }
           {v.content}
       </div>
       );

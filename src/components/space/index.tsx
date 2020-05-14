@@ -1,16 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { State } from '../../types';
+import { State, Space } from '../../types';
 import { createDispatchHandler, ActionHandler } from "../../actions/redux-action";
 import { SpaceAction, SET_SPACE_ROUND } from '../../actions';
+import { ParallelPane } from './parallel';
 
+import './space.css';
 export interface SpaceProps extends ActionHandler<SpaceAction> {
-  curRound: number
+  curRound: number,
+  space: Space
 };
 function SpacePaneBase(props: SpaceProps): JSX.Element {
   return (  
     <div className='Frame SpaceView'>
-        <button onClick={() => {
+        <button style={{    position: 'absolute',
+    top: 700}} onClick={() => {
           props.handleAction({
             type: SET_SPACE_ROUND,
             payload:{
@@ -18,12 +22,29 @@ function SpacePaneBase(props: SpaceProps): JSX.Element {
             }
           });
         }}>Test</button>
+      <div className='space-up-div'>
+        <ParallelPane 
+          title='Contribution Space'
+          id='contribution'
+          data={props.space.contribution}
+          width={250}
+          color='#69b3a2'
+        />
+        <ParallelPane 
+          title='Anomaly Space'
+          id='anomaly'
+          data={props.space.anomaly}
+          width={120}
+          color='#69b3a2'
+        />
+      </div>
     </div>
   );
 }
 
 const mapStateToProps = (state: State) => ({
-  curRound: 10
+  curRound: 10,
+  space: state.Space
 });
 export const SpacePane = connect(
   mapStateToProps,
