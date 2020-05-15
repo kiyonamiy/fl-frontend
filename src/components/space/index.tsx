@@ -41,7 +41,7 @@ function SpacePaneBase(props: SpaceProps): JSX.Element {
           id='anomaly'
           data={props.space.anomaly}
           width={120}
-          color='#69b3a2'
+          color='#c96e32'
         />
       </div>
     </div>
