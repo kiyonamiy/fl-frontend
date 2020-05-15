@@ -1,5 +1,5 @@
 import { call, put, all, takeLatest, select } from 'redux-saga/effects';
-import { SET_SPACE_ROUND, SetSpaceRound, SetAnomalySpace, SET_ANOMALY_SPACE, SetContributionSpace, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE } from '../space';
+import { SET_SPACE_ROUND, SetSpaceRound, SET_ANOMALY_SPACE, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE } from '../space';
 import { getKrum, getFoolsGold, getZeno, getAuror, getSniper, getPca, getContributionGrad, getContributionPerformance } from '../../api';
 import { getLayers, getClientNum, getRound } from '../../components/utils/selector';
 import { Parallel, DEFAULT_ANOMALY_METRICS, DEFAULT_CONTRIBUTION_METRICS, DEFAULT_ANOMALY_SCALE, DEFAULT_CONTRIBUTION_SCALE, MetricValue } from '../../types';

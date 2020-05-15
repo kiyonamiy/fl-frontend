@@ -5,8 +5,10 @@ import { MetricValue } from '../../types';
 import { connect } from 'react-redux';
 
 import './projection.css';
+import { ActionHandler, createDispatchHandler } from '../../actions/redux-action';
+import { UtilsAction, SET_HIGHLIGHT_CLIENT } from '../../actions/utils';
 const cos = (a: number[], b: number[]): number => {
-  if (a.length != b.length)
+  if (a.length !== b.length)
     console.assert('Lenght of array A && B to Cos are not equal!');
   let res = 0, 
       sumA = 0,
@@ -33,7 +35,7 @@ const sim2dist = (matrix: number[][]): number[][] => {
 
   return result;
 }
-export interface ProjectionProps {
+export interface ProjectionProps extends ActionHandler<UtilsAction>{
   data: MetricValue[],
   anomalyFilter: boolean[],
   contributionFilter: boolean[]
@@ -52,7 +54,7 @@ function ProjectionPaneBase(props: ProjectionProps): JSX.Element {
       vector: v.vector.filter((v,i) => filterArray[i])
     }
   });
-  if (data.length == 0) {
+  if (data.length === 0) {
     return (
       <div className='projection-view'>
   
@@ -106,6 +108,22 @@ function ProjectionPaneBase(props: ProjectionProps): JSX.Element {
               cx={x(v[0])}
               cy={y(v[1])}
               r={3}
+              onMouseOver={() => {
+                props.handleAction({
+                  type: SET_HIGHLIGHT_CLIENT,
+                  payload: {
+                    client: i
+                  }
+                });
+              }}
+              onMouseLeave={() => {
+                props.handleAction({
+                  type: SET_HIGHLIGHT_CLIENT,
+                  payload: {
+                    client: -1
+                  }
+                });
+              }}
             />
           )}
         </g>
@@ -116,5 +134,5 @@ function ProjectionPaneBase(props: ProjectionProps): JSX.Element {
 
 export const ProjectionPane = connect(
   null,
-  null
+  createDispatchHandler<UtilsAction>()
 )(ProjectionPaneBase);

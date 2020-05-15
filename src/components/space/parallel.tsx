@@ -7,8 +7,9 @@ import { Select, OptionProps } from '../utils/select';
 import './parallel.css';
 import { ActionHandler, createDispatchHandler } from '../../actions/redux-action';
 import { SpaceAction, SET_ANOMALY_FILTER, SET_CONTRIBUTION_FILTER } from '../../actions';
+import { UtilsAction, SET_HIGHLIGHT_CLIENT } from '../../actions/utils';
 
-export interface ParallelProps extends ActionHandler<SpaceAction> {
+export interface ParallelProps extends ActionHandler<SpaceAction | UtilsAction> {
   title: string,
   id: 'contribution' | 'anomaly',
   data: Parallel,
@@ -31,7 +32,7 @@ function ParallelPaneBase(props: ParallelProps): JSX.Element {
     newCurMetrics[index] = !newCurMetrics[index];
     setcurMetrics(newCurMetrics);
     props.handleAction({
-      type: props.id == 'anomaly' ? SET_ANOMALY_FILTER : SET_CONTRIBUTION_FILTER,
+      type: props.id === 'anomaly' ? SET_ANOMALY_FILTER : SET_CONTRIBUTION_FILTER,
       payload: {
         filter: curMetrics
       }
@@ -82,7 +83,24 @@ function ParallelPaneBase(props: ParallelProps): JSX.Element {
       .attr('class', (d) => `parallel-${props.id}-client-${d.id}`)
       .style('fill', 'none')
       .style('stroke', props.color)
-      .style('opacity', 0.5);
+      .style('opacity', 0.5)
+      .style('cursor', 'pointer')
+      .on('mouseover', d => {
+        props.handleAction({
+          type: SET_HIGHLIGHT_CLIENT,
+          payload: {
+            client: d.id
+          }
+        });
+      })
+      .on('mouseleave', () => {
+        props.handleAction({
+          type: SET_HIGHLIGHT_CLIENT,
+          payload: {
+            client: -1
+          }
+        });
+      });
 
     // Draw the axis:
     g.selectAll('myAxis')
@@ -130,5 +148,5 @@ const mapStateToProps = (state: State) => ({
 });
 export const ParallelPane = connect(
   mapStateToProps,
-  createDispatchHandler<SpaceAction>()
+  createDispatchHandler<SpaceAction | UtilsAction>()
 )(ParallelPaneBase);
