@@ -1,8 +1,16 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { TableWrapper, TableHeaderWrapper, TableBodyWrapper, TableItem, TableRow } from './styled';
+import {
+  TableWrapper,
+  TableHeaderWrapper,
+  TableBodyWrapper,
+  TableItem,
+  TableRow,
+  TableOhterRow
+} from './styled';
 import BarChartTD from './bar-chart-td';
 import RoundCircleTD from './round-circle-td';
+import ControlPanel from './control-panel';
 import BoxPlotTD from './box-plot-td';
 
 import { Performance, State, RoundRes, ClientRes } from '../../types';
@@ -43,8 +51,10 @@ function ClientTable(props: ClientTableProps): JSX.Element {
 
   return (
     <TableWrapper>
-      <BoxPlotTD />
-
+      <TableOhterRow>
+        <ControlPanel />
+        <BoxPlotTD performance={props.performance} />
+      </TableOhterRow>
       <TableHeaderWrapper>
         <TableItem key="ID" width={ID_TD_WIDTH}>
           ID

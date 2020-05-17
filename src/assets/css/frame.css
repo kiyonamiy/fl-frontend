@@ -1,5 +1,5 @@
-.Frame{
-  border: 1px dashed #D8D8D8;
+.Frame {
+  border: 1px dashed #d8d8d8;
   height: 100px;
   width: 100px;
   font-family: sans-serif;
@@ -8,23 +8,23 @@
   padding: 5px;
 }
 
-.Frame.ClientView{
+.Frame.ClientView {
   position: absolute;
   left: 5px;
   top: 5px;
-  width: 650px;
+  width: 700px;
   height: 715px;
 }
 
-.Frame.SpaceView{
+.Frame.SpaceView {
   position: absolute;
-  left: 660px;
+  left: 710px;
   top: 5px;
   width: 1255px;
   height: 715px;
 }
 
-.Frame.ModelView{
+.Frame.ModelView {
   position: absolute;
   left: 5px;
   top: 725px;
@@ -32,7 +32,7 @@
   height: 350px;
 }
 
-.Frame.GradientView{
+.Frame.GradientView {
   position: absolute;
   left: 510px;
   top: 725px;

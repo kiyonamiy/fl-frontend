@@ -13,8 +13,6 @@ class ServerClient extends React.Component {
   }
 
   render() {
-    console.log('server-client render');
-    console.log(this.props.performance);
     let clients = this.getClients(this.props.performance);
     this.createSankey(clients);
     return null;

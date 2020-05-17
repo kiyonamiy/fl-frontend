@@ -2,16 +2,22 @@ import styled from 'styled-components';
 
 const TableRowMixin = `
   display: flex;
-  height: 20%;
+  height: 15%;
   border-bottom: 1px solid #f0f0f0;
 `;
 
 export const TableWrapper = styled.div`
   width: 100%;
   height: 100%;
+  padding: 5px 10px;
   font-size: 14px;
   font-family: -apple-system, BlinkMacSystemFont, segoe ui, Roboto, helvetica neue, Arial, noto sans,
     sans-serif, apple color emoji, segoe ui emoji, segoe ui symbol, noto color emoji;
+`;
+
+export const TableOhterRow = styled.div`
+  ${TableRowMixin}
+  height: 25%
 `;
 
 export const TableHeaderWrapper = styled.div`
@@ -23,7 +29,7 @@ export const TableHeaderWrapper = styled.div`
 `;
 
 export const TableBodyWrapper = styled.div`
-  height: 50%;
+  height: 70%;
   overflow: auto;
 `;
 
@@ -41,10 +47,4 @@ export const TableItem = styled.div`
   align-items: center;
   justify-content: center;
   /* border: 1px solid red; */
-`;
-
-export const TableFooterWrapper = styled.div`
-  background: yellow;
-  height: 25%;
-  overflow: auto;
 `;
