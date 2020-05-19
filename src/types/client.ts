@@ -25,11 +25,17 @@ export type Client = {
   performance: Performance;
   test: any;
   error: object;
+  latestRound: number;
+  displayRound: number;
+  auto: boolean;
 };
 
 export const DEFAULT_CLIENTS: Client = {
   fetched: false,
   performance: [],
   test: {},
-  error: {}
+  error: {},
+  latestRound: 10,
+  displayRound: 10,
+  auto: true
 };

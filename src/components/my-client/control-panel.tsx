@@ -1,7 +1,47 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Switch, Input } from 'antd';
 
-export default function(): JSX.Element {
+interface ControlPanelProps {
+  auto: boolean;
+  latestRound: number;
+  displayRound: number;
+  setDisplayRound: (round: number) => void;
+  setAuto: (auto: boolean) => void;
+}
+
+function changeDisplayInputValue(
+  valueStr: string,
+  latestRound: number,
+  setDisplayInput: React.Dispatch<React.SetStateAction<string>>,
+  setDisplayRound: (round: number) => void,
+  setAuto: (auto: boolean) => void
+) {
+  // 输入就设置为非自动
+  setAuto(false);
+
+  if (valueStr === '') {
+    setDisplayInput('');
+    return;
+  }
+  const value = parseInt(valueStr, 10);
+  if (isNaN(value) || value > latestRound) {
+    setDisplayRound(latestRound);
+    setDisplayInput(latestRound.toString());
+  } else {
+    setDisplayRound(value);
+    setDisplayInput(value.toString());
+  }
+}
+
+export default function(props: ControlPanelProps): JSX.Element {
+  // 为了使输入正常，必须和 props.displayRound 分开处理
+  const [displayInput, setDisplayInput] = useState(props.displayRound.toString());
+
+  // 自动更新时，对应更新
+  useEffect(() => {
+    setDisplayInput(props.displayRound.toString());
+  }, [props.displayRound]);
+
   return (
     <div
       style={{
@@ -14,16 +54,32 @@ export default function(): JSX.Element {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span>Round:</span> <span>{`${`495`}/${500}`}</span>
+        <span>Round:</span> <span>{`${props.latestRound}/${500}`}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        Display: <Input value={493} style={{ height: 18, width: 50 }} />
+        Display:{' '}
+        <Input
+          value={displayInput}
+          style={{ height: 18, width: 50 }}
+          onChange={(event) => {
+            changeDisplayInputValue(
+              event.target.value,
+              props.latestRound,
+              setDisplayInput,
+              props.setDisplayRound,
+              props.setAuto
+            );
+          }}
+        />
       </div>
       <Switch
         checkedChildren="Auto"
         unCheckedChildren="Manu"
-        defaultChecked
+        checked={props.auto}
         style={{ width: 60 }}
+        onClick={() => {
+          props.setAuto(!props.auto);
+        }}
       />
     </div>
   );

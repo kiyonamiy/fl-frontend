@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
 interface BarChartTDProps {
+  isHovered: boolean;
   test: {
     accuracy: number;
     loss: number;
@@ -20,8 +21,8 @@ export default function(props: BarChartTDProps): JSX.Element {
     if (divEle == null) {
       return;
     }
-    const TRAIN_COLOR = 'rgb(152, 172, 197)';
-    const TEST_COLOR = 'rgb(107, 72, 106)';
+    const TRAIN_COLOR = `rgb(153, 172, 196)`;
+    const TEST_COLOR = `rgb(107, 73, 106)`;
     const data = [
       {
         band: 'test-accuracy',
@@ -76,5 +77,14 @@ export default function(props: BarChartTDProps): JSX.Element {
       .attr('width', (d) => `${y(d.num)}%`);
   });
   // 必须在这个div设置长度和宽度，不然上面取不到！！！
-  return <div ref={divRef} style={{ width: `100%`, height: `100%` }} />;
+  return (
+    <div
+      ref={divRef}
+      style={{
+        width: `100%`,
+        height: `100%`,
+        background: `${props.isHovered ? 'rgb(228, 228, 228)' : 'white'}`
+      }}
+    />
+  );
 }
