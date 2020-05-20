@@ -14,8 +14,20 @@ import ControlPanel from './control-panel';
 import BoxPlotTD from './box-plot-td';
 
 import { Performance, State, RoundRes, ClientRes } from '../../types';
-import { ClientAction, BEGIN_GET_PERFORMANCE, SET_DISPLAY_ROUND, SET_AUTO } from '../../actions';
+import {
+  ClientAction,
+  SCHEDULED_UPDATE_LATEST_ROUND,
+  SET_DISPLAY_ROUND,
+  SET_AUTO,
+  DISPLAY_ROUND_INPUT_CHANGE
+} from '../../actions';
 import { createDispatchHandler, ActionHandler } from '../../actions/redux-action';
+
+interface ClientRow {
+  clientId: number;
+  rounds: ClientRes[];
+  testAccuracyAvg: number;
+}
 
 export interface ClientTableProps extends ActionHandler<ClientAction> {
   performance: Performance;
@@ -32,7 +44,7 @@ function ClientTable(props: ClientTableProps): JSX.Element {
 
   useEffect(() => {
     props.handleAction({
-      type: BEGIN_GET_PERFORMANCE,
+      type: SCHEDULED_UPDATE_LATEST_ROUND,
       payload: {
         round: props.latestRound,
         number: 5,
@@ -47,10 +59,9 @@ function ClientTable(props: ClientTableProps): JSX.Element {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
       props.handleAction({
-        type: BEGIN_GET_PERFORMANCE,
+        type: SCHEDULED_UPDATE_LATEST_ROUND,
         payload: {
           round: props.latestRound + 1,
-          number: 5,
           auto: props.auto
         }
       });
@@ -58,20 +69,31 @@ function ClientTable(props: ClientTableProps): JSX.Element {
   }, [props.latestRound, props.auto]);
 
   // 将行列对调，更简单地按照每行 client 进行 rounds 的绘制
-  const clientArray: ClientRes[][] = [];
+  const clientIdMapRounds = new Map<number, ClientRes[]>();
   for (const round of props.performance) {
     for (const client of round.clients) {
-      if (clientArray[client.id] == null) {
-        clientArray[client.id] = [];
-      }
-      clientArray[client.id].push({
+      let rounds: ClientRes[] = clientIdMapRounds.get(client.id) || [];
+      rounds.push({
         train: client.train,
         test: client.test,
         id: client.id,
         round: round.round
       });
+      clientIdMapRounds.set(client.id, rounds);
     }
   }
+  // 再处理一遍
+  const clientRowArray: ClientRow[] = [];
+  clientIdMapRounds.forEach((rounds, clientId) => {
+    const avg = rounds.reduce((prev, cur) => prev + cur.test.accuracy, 0) / rounds.length;
+    clientRowArray.push({
+      clientId,
+      rounds,
+      testAccuracyAvg: avg
+    });
+  });
+  clientRowArray.sort((a, b) => a.testAccuracyAvg - b.testAccuracyAvg);
+
   // ID 和 rounds 两列所占百分比
   const ID_TD_WIDTH = 5;
   const ROUNDS_TD_WIDTH = 10;
@@ -84,9 +106,9 @@ function ClientTable(props: ClientTableProps): JSX.Element {
           auto={props.auto}
           latestRound={props.latestRound}
           displayRound={props.displayRound}
-          setDisplayRound={(displayRound: number) => {
+          displayRoundInputChange={(displayRound: number) => {
             props.handleAction({
-              type: SET_DISPLAY_ROUND,
+              type: DISPLAY_ROUND_INPUT_CHANGE,
               payload: {
                 displayRound
               }
@@ -118,20 +140,20 @@ function ClientTable(props: ClientTableProps): JSX.Element {
       </TableHeaderWrapper>
       {/* 表格主体（每行 client 的数据） */}
       <TableBodyWrapper>
-        {clientArray.map((clientRounds, clientId) => {
-          if (clientRounds == null) {
+        {clientRowArray.map((clientRow) => {
+          if (clientRow == null) {
             return null;
           }
           return (
             // 一行 Client 数据
-            <TableRow key={clientId}>
-              <TableItem key={`id-${clientId}`} width={ID_TD_WIDTH}>
-                {clientId}
+            <TableRow key={clientRow.clientId}>
+              <TableItem key={`id-${clientRow.clientId}`} width={ID_TD_WIDTH}>
+                {clientRow.clientId}
               </TableItem>
-              <TableItem key={`rounds-${clientId}`} width={ROUNDS_TD_WIDTH}>
-                <RoundCircleTD clientRounds={clientRounds} />
+              <TableItem key={`rounds-${clientRow.clientId}`} width={ROUNDS_TD_WIDTH}>
+                <RoundCircleTD clientRounds={clientRow.rounds} />
               </TableItem>
-              {clientRounds.map((round: ClientRes, index: number) => (
+              {clientRow.rounds.map((round: ClientRes, index: number) => (
                 <TableItem
                   key={index}
                   onMouseEnter={() => {

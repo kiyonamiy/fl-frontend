@@ -31,6 +31,28 @@ export const TableHeaderWrapper = styled.div`
 export const TableBodyWrapper = styled.div`
   height: 70%;
   overflow: auto;
+  /*控制整个滚动条*/
+  ::-webkit-scrollbar {
+    background-color: white;
+    width: 5px;
+    height: 5px;
+    background-clip: padding-box;
+  }
+
+  /*滚动条两端方向按钮*/
+  ::-webkit-scrollbar-button {
+    background-color: white;
+  }
+
+  /*滚动条中间滑动部分*/
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(222, 222, 222);
+    border-radius: 5px;
+  }
+
+  /*滚动条右下角区域*/
+  ::-webkit-scrollbar-corner {
+  }
 `;
 
 export const TableRow = styled.div`

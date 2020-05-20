@@ -1,18 +1,22 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
 import axios from 'axios';
 import {
-  BEGIN_GET_PERFORMANCE,
-  BeginGetPerformance,
-  GET_PERFORMANCE,
-  GetPerformance,
-  GetPerformanceError,
+  SCHEDULED_UPDATE_LATEST_ROUND,
+  ScheduledUpdateLatestRoundAction,
+  SET_PERFORMANCE,
+  SetPerformanceAction,
+  GetPerformanceErrorAction,
   GET_PERFORMANCE_ERROR,
-  SetLatestRound,
+  SetLatestRoundAction,
   SET_LATEST_ROUND,
-  SetDisplayRound,
-  SET_DISPLAY_ROUND
+  SetDisplayRoundAction,
+  SET_DISPLAY_ROUND,
+  DisplayRoundInputChangeAction,
+  DISPLAY_ROUND_INPUT_CHANGE
 } from '../client';
 import { Performance, RoundRes, ClientRes } from '../../types';
+
+const DEFAULT_PERFORMANCE_NUMBER = 5;
 
 const getData = (performance: any): Performance => {
   let res = [];
@@ -47,27 +51,28 @@ const getData = (performance: any): Performance => {
 };
 
 // worker saga
-function* showPerformanceAsync(action: BeginGetPerformance) {
+function* scheduledUpdateLatestRoundAsync(action: ScheduledUpdateLatestRoundAction) {
   try {
     const response = yield call(
       axios.get,
-      `/performance/?round=${action.payload.round}&number=${action.payload.number}`
+      `/performance/?round=${action.payload.round}&number=${action.payload.number ||
+        DEFAULT_PERFORMANCE_NUMBER}`
     );
     const performance = getData(response.data);
     // 自动更新的时候，更改当前数据
     if (action.payload.auto) {
-      const performanceAction: GetPerformance = {
-        type: GET_PERFORMANCE,
+      const setPerformanceAction: SetPerformanceAction = {
+        type: SET_PERFORMANCE,
         payload: {
           performance,
           test: response.data
         }
       };
-      yield put(performanceAction);
+      yield put(setPerformanceAction);
     }
     // 轮询的时候，不断更新显示的 latest round（无数据，不更新）
     if (performance.length > 0) {
-      const setLatestRound: SetLatestRound = {
+      const setLatestRound: SetLatestRoundAction = {
         type: SET_LATEST_ROUND,
         payload: {
           latestRound: action.payload.round
@@ -76,7 +81,7 @@ function* showPerformanceAsync(action: BeginGetPerformance) {
       yield put(setLatestRound);
       // 自动更新的时候，修改 display round
       if (action.payload.auto) {
-        const setDisplayRound: SetDisplayRound = {
+        const setDisplayRound: SetDisplayRoundAction = {
           type: SET_DISPLAY_ROUND,
           payload: {
             displayRound: action.payload.round
@@ -86,7 +91,41 @@ function* showPerformanceAsync(action: BeginGetPerformance) {
       }
     }
   } catch (e) {
-    const errorAction: GetPerformanceError = {
+    const errorAction: GetPerformanceErrorAction = {
+      type: GET_PERFORMANCE_ERROR,
+      payload: {
+        error: e
+      }
+    };
+    yield put(errorAction);
+  }
+}
+
+function* displayRoundInputChangeAsync(action: DisplayRoundInputChangeAction) {
+  try {
+    const response = yield call(
+      axios.get,
+      `/performance/?round=${action.payload.displayRound}&number=${DEFAULT_PERFORMANCE_NUMBER}`
+    );
+    const performance = getData(response.data);
+    const setPerformanceAction: SetPerformanceAction = {
+      type: SET_PERFORMANCE,
+      payload: {
+        performance,
+        test: response.data
+      }
+    };
+    yield put(setPerformanceAction);
+
+    const setDisplayRound: SetDisplayRoundAction = {
+      type: SET_DISPLAY_ROUND,
+      payload: {
+        displayRound: action.payload.displayRound
+      }
+    };
+    yield put(setDisplayRound);
+  } catch (e) {
+    const errorAction: GetPerformanceErrorAction = {
       type: GET_PERFORMANCE_ERROR,
       payload: {
         error: e
@@ -98,5 +137,6 @@ function* showPerformanceAsync(action: BeginGetPerformance) {
 
 // wacther saga
 export function* watchGetPerformance() {
-  yield takeLatest(BEGIN_GET_PERFORMANCE, showPerformanceAsync);
+  yield takeLatest(SCHEDULED_UPDATE_LATEST_ROUND, scheduledUpdateLatestRoundAsync);
+  yield takeLatest(DISPLAY_ROUND_INPUT_CHANGE, displayRoundInputChangeAsync);
 }

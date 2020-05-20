@@ -1,7 +1,7 @@
 import { Client, DEFAULT_CLIENTS } from '../types';
 import {
   ClientAction,
-  GET_PERFORMANCE,
+  SET_PERFORMANCE,
   GET_PERFORMANCE_ERROR,
   SET_LATEST_ROUND,
   SET_DISPLAY_ROUND,
@@ -13,7 +13,7 @@ export const clientReducer = (state: Client = DEFAULT_CLIENTS, action: ClientAct
     case GET_PERFORMANCE_ERROR: {
       return { ...state, error: action.payload.error };
     }
-    case GET_PERFORMANCE: {
+    case SET_PERFORMANCE: {
       return {
         ...state,
         fetched: true,

@@ -5,7 +5,7 @@ interface ControlPanelProps {
   auto: boolean;
   latestRound: number;
   displayRound: number;
-  setDisplayRound: (round: number) => void;
+  displayRoundInputChange: (round: number) => void;
   setAuto: (auto: boolean) => void;
 }
 
@@ -13,7 +13,7 @@ function changeDisplayInputValue(
   valueStr: string,
   latestRound: number,
   setDisplayInput: React.Dispatch<React.SetStateAction<string>>,
-  setDisplayRound: (round: number) => void,
+  displayRoundInputChange: (round: number) => void,
   setAuto: (auto: boolean) => void
 ) {
   // 输入就设置为非自动
@@ -25,10 +25,10 @@ function changeDisplayInputValue(
   }
   const value = parseInt(valueStr, 10);
   if (isNaN(value) || value > latestRound) {
-    setDisplayRound(latestRound);
+    displayRoundInputChange(latestRound);
     setDisplayInput(latestRound.toString());
   } else {
-    setDisplayRound(value);
+    displayRoundInputChange(value);
     setDisplayInput(value.toString());
   }
 }
@@ -66,7 +66,7 @@ export default function(props: ControlPanelProps): JSX.Element {
               event.target.value,
               props.latestRound,
               setDisplayInput,
-              props.setDisplayRound,
+              props.displayRoundInputChange,
               props.setAuto
             );
           }}
