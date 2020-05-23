@@ -1,11 +1,12 @@
 import { call, put, all, takeLatest, select } from 'redux-saga/effects';
-import { SET_SPACE_ROUND, SetSpaceRound, SET_ANOMALY_SPACE, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE } from '../space';
-import { getKrum, getFoolsGold, getZeno, getAuror, getSniper, getPca, getContributionGrad, getContributionPerformance } from '../../api';
-import { getLayers, getClientNum, getRound } from '../../components/utils/selector';
-import { Parallel, DEFAULT_ANOMALY_METRICS, DEFAULT_CONTRIBUTION_METRICS, DEFAULT_ANOMALY_SCALE, DEFAULT_CONTRIBUTION_SCALE, MetricValue } from '../../types';
+import { SET_SPACE_ROUND, SetSpaceRound, SET_ANOMALY_SPACE, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE, SET_ANOMALY_FILTER, SET_CONTRIBUTION_FILTER, SetAnomalyFilter, SetContributionFilter, SET_SPACE_TOP_K, SetSpaceTopK } from '../space';
+import { getKrum, getFoolsGold, getZeno, getAuror, getSniper, getPca, getContributionGrad, getContributionPerformance, getGradient } from '../../api';
+import { getLayers, getClientNum, getRound, getAnomaly, getSpaceK } from '../../components/utils/selector';
+import { Parallel, DEFAULT_ANOMALY_METRICS, DEFAULT_CONTRIBUTION_METRICS, DEFAULT_ANOMALY_SCALE, DEFAULT_CONTRIBUTION_SCALE, MetricValue, ClientValue, Weight } from '../../types';
 import { deepClone } from '../../components/utils/deepclone';
+import { SetGradient, SET_GRADIENT } from '../gradient';
 
-const transferData = (spaceRes: any, metrics: string[], scale: number[][], clientNum: number): Parallel => {
+const transferSpaceData = (spaceRes: any, metrics: string[], scale: number[][], clientNum: number): Parallel => {
     const res: Parallel = {
         metrics: metrics.concat(),
         scale: scale,
@@ -32,6 +33,22 @@ const mergeVector = (anomalyData: Parallel, contributionData: Parallel): MetricV
     });
     return res;
 };
+
+const transferGradientData = (data: any, layers: string[]): Weight[] => {
+    const res: Weight[] = [];
+    for (let key in data) 
+        if (data.hasOwnProperty(key)) {
+            res.push({
+                id: +key,
+                vector: []
+            });
+            layers.forEach(layer => {
+                res[res.length - 1].vector.push(...data[+key][layer]);
+            });
+    }
+    return res;
+};
+
 function* requestSpace(action: SetSpaceRound): any {
     const layers: string[] = yield select(getLayers);
     const clientNum = yield select(getClientNum);
@@ -48,7 +65,7 @@ function* requestSpace(action: SetSpaceRound): any {
         call(getContributionPerformance, {round: round}),
         call(getContributionPerformance, {metric: 'loss', round: round}),
     ]);
-    const anomalyRes = transferData(spaceResult.slice(0, 6), DEFAULT_ANOMALY_METRICS, DEFAULT_ANOMALY_SCALE, clientNum);
+    const anomalyRes = transferSpaceData(spaceResult.slice(0, 6), DEFAULT_ANOMALY_METRICS, DEFAULT_ANOMALY_SCALE, clientNum);
     const anomalyAction = {
         type: SET_ANOMALY_SPACE,
         payload: {
@@ -57,7 +74,7 @@ function* requestSpace(action: SetSpaceRound): any {
     };
     yield put(anomalyAction);
 
-    const contributionRes = transferData(spaceResult.slice(6, 10), DEFAULT_CONTRIBUTION_METRICS, DEFAULT_CONTRIBUTION_SCALE, clientNum);;
+    const contributionRes = transferSpaceData(spaceResult.slice(6, 10), DEFAULT_CONTRIBUTION_METRICS, DEFAULT_CONTRIBUTION_SCALE, clientNum);;
     const contributionAction = {
         type: SET_CONTRIBUTION_SPACE,
         payload: {
@@ -74,8 +91,68 @@ function* requestSpace(action: SetSpaceRound): any {
       }
     };
     yield put(concatAction);
+
+    const gradientRes = yield all ([
+        call(getGradient, {round: Math.max(1, round - 1)}),
+        call(getGradient, {round: round}),
+        call(getGradient, {round: round, avg: true}),
+    ]);
+    const curWeidht: Weight[] = transferGradientData(gradientRes[1].data, layers);
+    const preWeight: Weight[] = round > 0 ? 
+        transferGradientData(gradientRes[0].data, layers)
+        :
+        curWeidht.map(v => ({
+            id: v.id,
+            vector: new Array(v.vector.length).fill(0)
+        }));
+    let avgWeight: number[] = [];
+    const layersNum: number[] = [];
+    layers.forEach(layer => {
+        avgWeight = avgWeight.concat(gradientRes[2].data[layer]);
+        layersNum.push(gradientRes[2].data[layer].length);
+    });
+    const gradientAction: SetGradient = {
+        type: SET_GRADIENT,
+        payload: {
+            gradient: {
+                curRound: curWeidht,
+                preRound: preWeight,
+                avgRound: avgWeight,
+                layersNum: layersNum
+            }
+        }
+    };
+    yield put(gradientAction);
 }
 // wacther saga
 export function* watchSetSpaceRound() {
     yield takeLatest(SET_SPACE_ROUND, requestSpace)
   }
+
+const sum = (a: number[]): number => {
+    return a.reduce((prev, cur) => prev + cur, 0);
+}
+function* requestMetrics(action: SetAnomalyFilter): any {
+    const anomaly: Parallel = yield select(getAnomaly);
+    const vector: ClientValue[] = anomaly.value.map(v => ({
+        id: v.id,
+        value: sum(v.vector.filter((v,i) => action.payload.filter[i]))
+        })
+    );
+    vector.sort((a,b) => a.value - b.value);
+    const k: number = yield select(getSpaceK);
+    const clients = [];
+    for (let index = 0; index < k; index++) {
+        clients.push(vector[index].id);
+    }
+    const SpaceTopK: SetSpaceTopK = {
+        type: SET_SPACE_TOP_K,
+        payload: {
+            clients: clients
+        }
+    };
+    yield put(SpaceTopK);
+}
+export function* wacthMetricChange() {
+    yield takeLatest(SET_ANOMALY_FILTER, requestMetrics);
+}

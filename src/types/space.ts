@@ -3,6 +3,11 @@ export interface MetricValue {
     vector: number[]
 };
 
+export interface ClientValue {
+    id: number,
+    value: number
+};
+
 export interface Parallel {
     metrics: string[],
     scale: number[][],
@@ -23,6 +28,7 @@ export interface Position {
 export type Heatmap = MetricValue[];
 
 export type Space = {
+    K: number,
     clients: number[],
     anomaly: Parallel,
     contribution: Parallel,
@@ -32,6 +38,7 @@ export type Space = {
 };
 
 export const DEFAULT_SPACE: Space = {
+    K: 5,
     clients: [],
     anomaly: {
         metrics: DEFAULT_ANOMALY_METRICS,

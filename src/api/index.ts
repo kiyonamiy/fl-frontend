@@ -100,3 +100,11 @@ export const getContributionPerformance = ({round=-1, metric='accuracy', layers=
           }
     })
 };
+
+export const getGradient = ({round=-1, avg=false}) => {
+    return axios.get(avg ? 'avg_grad' : 'client_grad/', {
+        params: {
+            round: round
+        }
+    });
+}

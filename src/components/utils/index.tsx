@@ -32,7 +32,7 @@ export interface UtilsProps extends ActionHandler<UtilsAction> {
     preClient: number
 };
 function UtilsPaneBase(props: UtilsProps): JSX.Element {
-    if (props.client == -1) {
+    if (props.client === -1) {
         focusFunc([], true);
     }
     else if (props.client >= 0) {
