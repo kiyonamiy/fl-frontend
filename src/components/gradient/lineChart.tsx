@@ -56,7 +56,7 @@ function LineChartPaneBase(props: LineChartProps): JSX.Element {
       
       props.data.forEach(weight => {
         g.append('path')
-          .attr('class', `${props.id}-${weight.id}`)
+          .attr('class', `gradient-${weight.id}`)
           .datum(weight.vector)
           .attr('fill', 'none')
           .attr('stroke', `url(#line-gradient-${props.id})`)
