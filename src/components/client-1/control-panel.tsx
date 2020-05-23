@@ -45,9 +45,9 @@ export default function(props: ControlPanelProps): JSX.Element {
   return (
     <div
       style={{
-        width: '25%',
-        fontSize: 12,
-        padding: '40px 30px 40px 25px',
+        width: '100%',
+        height: '100%',
+        padding: '20% 20%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-around'

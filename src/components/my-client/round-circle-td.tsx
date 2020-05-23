@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import { ClientRes } from '../../types';
+import { circleColorArray } from './constants';
 
 interface RoundCircleTDProps {
   clientRounds: ClientRes[];
@@ -8,13 +9,7 @@ interface RoundCircleTDProps {
 
 export default function(props: RoundCircleTDProps): JSX.Element {
   const divRef = useRef<HTMLDivElement>(null);
-  const circleColorArray = [
-    'rgb(255, 255, 217)',
-    'rgb(193, 231, 181)',
-    'rgb(69, 180, 194)',
-    'rgb(34, 95, 169)',
-    'rgb(8, 29, 88)'
-  ];
+
   const STEP = 14;
 
   useEffect(() => {

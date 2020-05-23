@@ -1,0 +1,27 @@
+#clients-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 控制整个滚动条 */
+#clients-container::-webkit-scrollbar {
+  background-color: white;
+  width: 3px;
+  height: 3px;
+  background-clip: padding-box;
+}
+
+/*滚动条两端方向按钮*/
+#clients-container::-webkit-scrollbar-button {
+  background-color: white;
+}
+
+/*滚动条中间滑动部分*/
+#clients-container::-webkit-scrollbar-thumb {
+  background-color: rgb(222, 222, 222);
+  border-radius: 3px;
+}
+
+/*滚动条右下角区域*/
+#clients-container::-webkit-scrollbar-corner {
+}

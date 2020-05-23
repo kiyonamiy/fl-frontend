@@ -1,6 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
+const getAccuracyData = function(data: any[]) {
+  return data.filter((value, index) => index < data.length / 2);
+};
+
+const getLossData = function(data: any[]) {
+  return data.filter((value, index) => index >= data.length / 2);
+};
+
 interface BarChartTDProps {
   isHovered: boolean;
   test: {
@@ -21,24 +29,24 @@ export default function(props: BarChartTDProps): JSX.Element {
     if (divEle == null) {
       return;
     }
-    const TRAIN_COLOR = `rgb(153, 172, 196)`;
-    const TEST_COLOR = `rgb(107, 73, 106)`;
+    const ACCURACY_COLOR = `rgb(153, 172, 196)`;
+    const LOSS_COLOR = `rgb(107, 73, 106)`;
     const data = [
-      {
-        band: 'test-accuracy',
-        num: props.test.accuracy
-      },
-      {
-        band: 'test-loss',
-        num: props.test.loss
-      },
       {
         band: 'train-accuracy',
         num: props.train.accuracy
       },
       {
+        band: 'test-accuracy',
+        num: props.test.accuracy
+      },
+      {
         band: 'train-loss',
         num: props.train.loss
+      },
+      {
+        band: 'test-loss',
+        num: props.test.loss
       }
     ];
 
@@ -59,22 +67,37 @@ export default function(props: BarChartTDProps): JSX.Element {
       .range([margin.top, height - margin.bottom])
       .domain(data.map((d) => d.band))
       .padding(0.07);
-    const y = d3
+    const accuracyY = d3
       .scaleLinear()
       .range([margin.left, width - margin.right])
-      .domain([0, d3.max(data, (d) => d.num) || 0]);
+      .domain([0, (d3.max(getAccuracyData(data), (d) => d.num) as number) * 1.1]);
+    const lossY = d3
+      .scaleLinear()
+      .range([margin.left, width - margin.right])
+      .domain([0, (d3.max(getLossData(data), (d) => d.num) as number) * 1.1]);
 
     // append the rectangles for the bar chart
     svg
       .selectAll()
-      .data(data)
+      .data(getAccuracyData(data))
       .enter()
       .append('rect')
-      .attr('fill', (d) => (d.band.startsWith('train') ? TRAIN_COLOR : TEST_COLOR))
+      .attr('fill', (d) => (d.band.endsWith('accuracy') ? ACCURACY_COLOR : LOSS_COLOR))
       .attr('y', (d) => `${x(d.band) || 0}%`)
       .attr('x', `${margin.left}%`)
       .attr('height', `${x.bandwidth()}%`)
-      .attr('width', (d) => `${y(d.num)}%`);
+      .attr('width', (d) => `${accuracyY(d.num)}%`);
+
+    svg
+      .selectAll()
+      .data(getLossData(data))
+      .enter()
+      .append('rect')
+      .attr('fill', (d) => (d.band.endsWith('accuracy') ? ACCURACY_COLOR : LOSS_COLOR))
+      .attr('y', (d) => `${x(d.band) || 0}%`)
+      .attr('x', `${margin.left}%`)
+      .attr('height', `${x.bandwidth()}%`)
+      .attr('width', (d) => `${lossY(d.num)}%`);
   });
   // 必须在这个div设置长度和宽度，不然上面取不到！！！
   return (

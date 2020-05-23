@@ -4,7 +4,7 @@ import * as d3 from 'd3';
 import '../../assets/css/client/bar-chart.css';
 import { Performance, State } from '../../types';
 import { createDispatchHandler, ActionHandler } from '../../actions/redux-action';
-import { ClientAction, BEGIN_GET_PERFORMANCE } from '../../actions';
+import { ClientAction, SCHEDULED_UPDATE_LATEST_ROUND } from '../../actions';
 
 // export interface BarChartProps extends ActionHandler<ClientAction> {
 //   performance: Performance;
@@ -12,7 +12,7 @@ import { ClientAction, BEGIN_GET_PERFORMANCE } from '../../actions';
 function BarChart(props) {
   useEffect(() => {
     props.handleAction({
-      type: BEGIN_GET_PERFORMANCE,
+      type: SCHEDULED_UPDATE_LATEST_ROUND,
       payload: {
         round: 495,
         number: 5

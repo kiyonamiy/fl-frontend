@@ -6,12 +6,13 @@ import {
   TableBodyWrapper,
   TableItem,
   TableRow,
-  TableOhterRow
+  RoundColorScale
 } from './styled';
 import BarChartTD from './bar-chart-td';
 import RoundCircleTD from './round-circle-td';
 import ControlPanel from './control-panel';
 import BoxPlotTD from './box-plot-td';
+import Dendrogram from './dendrogram';
 
 import { Performance, State, RoundRes, ClientRes } from '../../types';
 import {
@@ -22,6 +23,7 @@ import {
   DISPLAY_ROUND_INPUT_CHANGE
 } from '../../actions';
 import { createDispatchHandler, ActionHandler } from '../../actions/redux-action';
+import { clientRowCount } from './constants';
 
 interface ClientRow {
   clientId: number;
@@ -62,6 +64,7 @@ function ClientTable(props: ClientTableProps): JSX.Element {
         type: SCHEDULED_UPDATE_LATEST_ROUND,
         payload: {
           round: props.latestRound + 1,
+          number: 5,
           auto: props.auto
         }
       });
@@ -83,7 +86,7 @@ function ClientTable(props: ClientTableProps): JSX.Element {
     }
   }
   // 再处理一遍
-  const clientRowArray: ClientRow[] = [];
+  let clientRowArray: ClientRow[] = [];
   clientIdMapRounds.forEach((rounds, clientId) => {
     const avg = rounds.reduce((prev, cur) => prev + cur.test.accuracy, 0) / rounds.length;
     clientRowArray.push({
@@ -92,15 +95,17 @@ function ClientTable(props: ClientTableProps): JSX.Element {
       testAccuracyAvg: avg
     });
   });
-  clientRowArray.sort((a, b) => a.testAccuracyAvg - b.testAccuracyAvg);
+  clientRowArray = clientRowArray
+    .sort((a, b) => a.testAccuracyAvg - b.testAccuracyAvg)
+    .filter((value, index) => index < clientRowCount);
 
   // ID 和 rounds 两列所占百分比
   const ID_TD_WIDTH = 5;
   const ROUNDS_TD_WIDTH = 10;
 
   return (
-    <TableWrapper>
-      <TableOhterRow>
+    <div style={{ width: '100%', height: '100%' }}>
+      <TableRow style={{ height: '25%' }}>
         {/* 左上角的控制面板 */}
         <ControlPanel
           auto={props.auto}
@@ -125,26 +130,28 @@ function ClientTable(props: ClientTableProps): JSX.Element {
         />
         {/* 右上角的盒须图 */}
         <BoxPlotTD performance={props.performance} />
-      </TableOhterRow>
-      {/* 表格头部（列说明）（ID Rounds Round1 Round2 Round3 Round4 Round5） */}
-      <TableHeaderWrapper>
-        <TableItem key="ID" width={ID_TD_WIDTH}>
-          ID
-        </TableItem>
-        <TableItem key="Rounds" width={ROUNDS_TD_WIDTH}>
-          Rounds
-        </TableItem>
-        {props.performance.map((aRound: RoundRes) => (
-          <TableItem key={aRound.round}>Round {aRound.round}</TableItem>
-        ))}
-      </TableHeaderWrapper>
-      {/* 表格主体（每行 client 的数据） */}
-      <TableBodyWrapper>
-        {clientRowArray.map((clientRow) => {
-          if (clientRow == null) {
-            return null;
-          }
-          return (
+      </TableRow>
+      <TableWrapper>
+        <TableRow style={{ height: '2%' }}>
+          <div style={{ width: 110 }} />
+          <RoundColorScale />
+        </TableRow>
+        {/* 表格头部（列说明）（ID Rounds Round1 Round2 Round3 Round4 Round5） */}
+        <TableHeaderWrapper>
+          <TableItem key="ID" width={ID_TD_WIDTH}>
+            ID
+          </TableItem>
+          <TableItem key="Rounds" width={ROUNDS_TD_WIDTH}>
+            Rounds
+          </TableItem>
+          {props.performance.map((aRound: RoundRes) => (
+            <TableItem key={aRound.round}>Round {aRound.round}</TableItem>
+          ))}
+        </TableHeaderWrapper>
+        {/* 表格主体（每行 client 的数据） */}
+        <TableBodyWrapper>
+          <Dendrogram />
+          {clientRowArray.map((clientRow) => (
             // 一行 Client 数据
             <TableRow key={clientRow.clientId}>
               <TableItem key={`id-${clientRow.clientId}`} width={ID_TD_WIDTH}>
@@ -171,10 +178,10 @@ function ClientTable(props: ClientTableProps): JSX.Element {
                 </TableItem>
               ))}
             </TableRow>
-          );
-        })}
-      </TableBodyWrapper>
-    </TableWrapper>
+          ))}
+        </TableBodyWrapper>
+      </TableWrapper>
+    </div>
   );
 }
 

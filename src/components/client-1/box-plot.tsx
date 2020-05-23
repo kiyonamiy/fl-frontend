@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Performance } from '../../types';
 import * as d3 from 'd3';
-interface BoxPlotTDProps {
+interface BoxPlotProps {
   performance: Performance;
 }
 interface RoundBoxPlotData {
@@ -76,12 +76,17 @@ function drawBoxPlotChart(divEle: HTMLDivElement, data: RoundBoxPlotData[]) {
   d3.select(divEle)
     .select('svg')
     .remove();
-  const margin = { top: 10, right: 30, bottom: 10, left: 30 };
+  const margin = {
+    top: 0.05 * divEle.clientHeight,
+    right: 0.07 * divEle.clientWidth,
+    bottom: 0.05 * divEle.clientHeight,
+    left: 0.07 * divEle.clientWidth
+  };
   const width = divEle.clientWidth - margin.left - margin.right;
   const height = divEle.clientHeight - margin.top - margin.bottom;
 
-  const BOX_WIDTH = 12;
-  const INTERVAL = 10;
+  const BOX_WIDTH = divEle.clientWidth * 0.025; // 设置 box 的宽度为总宽度的 0.025 倍
+  const INTERVAL = BOX_WIDTH; // accuracy box 和 loss box 间距
   const BOX_STROKE_COLOR = '#D8D8D8';
 
   // 用于 accuracy loss Y 轴 domain 确定
@@ -229,7 +234,7 @@ function drawBoxPlotChart(divEle: HTMLDivElement, data: RoundBoxPlotData[]) {
   }
 }
 
-export default function(props: BoxPlotTDProps): JSX.Element {
+export default function(props: BoxPlotProps): JSX.Element {
   const divRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -241,5 +246,5 @@ export default function(props: BoxPlotTDProps): JSX.Element {
     drawBoxPlotChart(divEle, roundBoxPlotDataArray);
   }, [props.performance]);
 
-  return <div style={{ width: '75%', height: '100%' }} ref={divRef} />;
+  return <div style={{ width: '100%', height: '100%' }} ref={divRef} />;
 }

@@ -1,23 +1,21 @@
 import styled from 'styled-components';
+import { circleColorArray, tableTotalColCount, roundColCount } from './constants';
 
 const TableRowMixin = `
   display: flex;
-  height: 15%;
-  border-bottom: 1px solid #f0f0f0;
+  height: 14%;
+  // border-bottom: 1px solid #f0f0f0;
 `;
 
 export const TableWrapper = styled.div`
-  width: 100%;
+  position: relative;
+  left: 10%;
+  width: 90%;
   height: 100%;
-  padding: 5px 10px;
+  padding: 0px 10px;
   font-size: 14px;
   font-family: -apple-system, BlinkMacSystemFont, segoe ui, Roboto, helvetica neue, Arial, noto sans,
     sans-serif, apple color emoji, segoe ui emoji, segoe ui symbol, noto color emoji;
-`;
-
-export const TableOhterRow = styled.div`
-  ${TableRowMixin}
-  height: 25%
 `;
 
 export const TableHeaderWrapper = styled.div`
@@ -25,12 +23,13 @@ export const TableHeaderWrapper = styled.div`
   height: 4%;
   color: rgba(0, 0, 0, 0.85);
   font-weight: 500;
-  background: #fafafa;
+  //background: #fafafa;
 `;
 
 export const TableBodyWrapper = styled.div`
+  position: relative;
   height: 70%;
-  overflow: auto;
+  /* overflow: auto; */
   /*控制整个滚动条*/
   ::-webkit-scrollbar {
     background-color: white;
@@ -59,14 +58,27 @@ export const TableRow = styled.div`
   ${TableRowMixin}
 `;
 
-//TODO 硬编码 除以 7
 export const TableItem = styled.div`
-  flex: 1 1 ${(props: { width?: number }) => props.width || 100 / 7}%;
+  position: relative;
+  flex: 1 1 ${(props: { width?: number }) => props.width || 100 / tableTotalColCount}%;
   overflow: hidden;
+  /* border: 1px solid red; */ // 测试
 
-  /* 居中 */
+  /* 内部居中 */
   display: flex;
   align-items: center;
   justify-content: center;
-  /* border: 1px solid red; */
 `;
+
+export const RoundColorScale = styled.div`
+  flex: 1 1;
+  background: linear-gradient(to right, ${circleColorArray.join(',')});
+`;
+
+/* export const AlreadyRoundProgress = styled.div`
+  position: absolute;
+  bottom: 0;
+  width: ${80}%;
+  height: 10%;
+  background: rgb(94, 112, 168);
+`; */

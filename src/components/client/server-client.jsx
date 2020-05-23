@@ -14,6 +14,8 @@ class ServerClient extends React.Component {
 
   render() {
     let clients = this.getClients(this.props.performance);
+    // console.log(this.props.performance);
+    // console.log(clients);
     this.createSankey(clients);
     return null;
   }
@@ -26,8 +28,11 @@ class ServerClient extends React.Component {
     let clients = {};
     for (let round in data) {
       if (data.hasOwnProperty(round)) {
+        // console.log('round', round);
         for (let id in data[round]['train']) {
           if (data[round]['train'].hasOwnProperty(id)) {
+            // console.log("data[round]['train']", data[round]['train']);
+            // console.log('id', id);
             if (clients.hasOwnProperty(id)) {
               clients[id].push(parseInt(round));
             } else {
@@ -146,7 +151,7 @@ class ServerClient extends React.Component {
         return colorScale(d.round);
       });
 
-    // add color legend
+    // add color legend 右上角
     const colorSvg = d3
       .select('#ClientView')
       .append('svg')

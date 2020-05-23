@@ -14,7 +14,7 @@ class BoxPlot extends React.Component {
 
   render() {
     let bins = this.getBins(this.props.performance);
-    console.log(bins);
+    // console.log(bins);
     this.createBoxPlot(bins);
     return null;
   }
