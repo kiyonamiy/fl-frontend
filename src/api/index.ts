@@ -62,7 +62,7 @@ export const getSniper = ({p=0.8, round=-1, layers=['dense']}) => {
     })
 };
 
-export const getPca = ({k=10, round=-1, layers=['dense']}) => {
+export const getPca = ({k=5, round=-1, layers=['dense']}) => {
     return axios.get('anomaly/pca/', {
         params: {
             k: k,
@@ -108,3 +108,12 @@ export const getGradient = ({round=-1, avg=false}) => {
         }
     });
 }
+
+export const getOneRoundMetrics = ({round=-1, layers=['dense']}) => {
+    return axios.get('one_round_metrics/', {
+        params: {
+            round: round,
+            layers: layers
+        },
+    })
+};
