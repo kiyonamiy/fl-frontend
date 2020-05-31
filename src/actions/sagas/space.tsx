@@ -1,10 +1,11 @@
 import { call, put, all, takeLatest, select } from 'redux-saga/effects';
-import { SET_SPACE_ROUND, SetSpaceRound, SET_ANOMALY_SPACE, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE, SET_ANOMALY_FILTER, SET_CONTRIBUTION_FILTER, SetAnomalyFilter, SetContributionFilter, SET_SPACE_TOP_K, SetSpaceTopK } from '../space';
-import { getKrum, getFoolsGold, getZeno, getAuror, getSniper, getPca, getContributionGrad, getContributionPerformance, getGradient, getOneRoundMetrics } from '../../api';
-import { getLayers, getClientNum, getRound, getAnomaly, getSpaceK } from '../../components/utils/selector';
-import { Parallel, DEFAULT_ANOMALY_METRICS, DEFAULT_CONTRIBUTION_METRICS, DEFAULT_ANOMALY_SCALE, DEFAULT_CONTRIBUTION_SCALE, MetricValue, ClientValue, Weight } from '../../types';
+import { SET_SPACE_ROUND, SetSpaceRound, SET_ANOMALY_SPACE, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE, SET_ANOMALY_FILTER, SET_CONTRIBUTION_FILTER, SetAnomalyFilter, SetContributionFilter, SET_SPACE_TOP_K, SetSpaceTopK, SetSPaceHeatmap, SET_SPACE_HEATMAP } from '../space';
+import { getGradient, getOneRoundMetrics, getAllRoundMetrics } from '../../api';
+import { getLayers, getClientNum, getRound, getAnomaly, getSpaceK, getHeatMap, getAnomalyFilter } from '../../components/utils/selector';
+import { Parallel, DEFAULT_ANOMALY_METRICS, DEFAULT_CONTRIBUTION_METRICS, DEFAULT_ANOMALY_SCALE, DEFAULT_CONTRIBUTION_SCALE, MetricValue, ClientValue, Weight, Heatmap } from '../../types';
 import { deepClone } from '../../components/utils/deepclone';
 import { SetGradient, SET_GRADIENT } from '../gradient';
+import { sum } from '../../components/utils/math';
 
 const transferSpaceData = (spaceRes: any, metrics: string[], scale: number[][], clientNum: number): Parallel => {
     const res: Parallel = {
@@ -48,6 +49,33 @@ const transferGradientData = (data: any, layers: string[]): Weight[] => {
     }
     return res;
 };
+
+function *resetHeatmap(): any {
+    yield requestMetrics({
+        type: SET_ANOMALY_FILTER,
+        payload: {
+            filter: yield select(getAnomalyFilter)
+        }
+    });
+    let allRes: any = yield call(getAllRoundMetrics, {});
+    const data = allRes.data.res;
+    const res: Heatmap = [];
+    for (let key in data)
+        if (data.hasOwnProperty(key)) {
+            res.push({
+                id: +key,
+                anomaly: data[key]['anomaly'],
+                contribution: data[key]['contribution']
+            })
+        }
+    const heatmapAction: SetSPaceHeatmap = {
+        type: SET_SPACE_HEATMAP,
+        payload: {
+            heatmap: res
+        }
+    };
+    yield put(heatmapAction);
+}
 
 function* requestSpace(action: SetSpaceRound): any {
     const layers: string[] = yield select(getLayers);
@@ -113,15 +141,17 @@ function* requestSpace(action: SetSpaceRound): any {
         }
     };
     yield put(gradientAction);
+
+    const heatmap = yield select(getHeatMap);
+    if (heatmap.length == 0) {
+        yield resetHeatmap();
+    }
 }
 // wacther saga
 export function* watchSetSpaceRound() {
     yield takeLatest(SET_SPACE_ROUND, requestSpace)
   }
 
-const sum = (a: number[]): number => {
-    return a.reduce((prev, cur) => prev + cur, 0);
-}
 function* requestMetrics(action: SetAnomalyFilter): any {
     const anomaly: Parallel = yield select(getAnomaly);
     const vector: ClientValue[] = anomaly.value.map(v => ({

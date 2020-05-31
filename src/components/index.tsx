@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import '../assets/css/frame.css'
 import BoxPlot from './client/box-plot';
 import ServerClient from './client/server-client';

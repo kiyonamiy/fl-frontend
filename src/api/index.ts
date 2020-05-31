@@ -117,3 +117,11 @@ export const getOneRoundMetrics = ({round=-1, layers=['dense']}) => {
         },
     })
 };
+
+export const getAllRoundMetrics = ({layers=['dense']}) => {
+    return axios.get('all_round_metrics/', {
+        params: {
+            layers: layers
+        },
+    })
+};

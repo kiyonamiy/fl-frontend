@@ -3,3 +3,9 @@
     height: 320px;
     display: flex;
 }
+
+.space-down-div {
+    position: relative;
+    width: 100%;
+    height: 395px;
+}

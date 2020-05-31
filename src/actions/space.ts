@@ -1,8 +1,8 @@
 import { ReduxAction } from "./redux-action";
-import { Parallel, MetricValue } from "../types";
+import { Parallel, MetricValue, Heatmap } from "../types";
 
 export type SpaceAction = (SetAnomalySpace | SetContributionSpace | SetConcatSpace
-    | SetAnomalyFilter | SetContributionFilter | SetSpaceTopK | SetSpaceRound);
+    | SetAnomalyFilter | SetContributionFilter | SetSpaceTopK | SetSpaceRound | SetSPaceHeatmap);
 
 export const SET_ANOMALY_SPACE = 'SET_ANOMALY_SPACE';
 export type SetAnomalySpace = ReduxAction<typeof SET_ANOMALY_SPACE, {
@@ -37,4 +37,9 @@ export type SetSpaceTopK = ReduxAction<typeof SET_SPACE_TOP_K, {
 export const SET_SPACE_ROUND = 'SET_SPACE_ROUND';
 export type SetSpaceRound = ReduxAction<typeof SET_SPACE_ROUND, {
     round: number
+}>;
+
+export const SET_SPACE_HEATMAP = 'SET_SPACE_HEATMAP';
+export type SetSPaceHeatmap = ReduxAction<typeof SET_SPACE_HEATMAP, {
+    heatmap: Heatmap
 }>;

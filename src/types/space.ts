@@ -3,6 +3,10 @@ export interface MetricValue {
     vector: number[]
 };
 
+export enum SpaceType {
+    Anomaly = 0,
+    Contribution
+};
 export interface ClientValue {
     id: number,
     value: number
@@ -25,7 +29,12 @@ export interface Position {
     y: number
 };
 
-export type Heatmap = MetricValue[];
+export interface HeatmapMetrics {
+    id: number,
+    anomaly: number[][],
+    contribution: number[][]
+};
+export type Heatmap = HeatmapMetrics[];
 
 export type Space = {
     K: number,
@@ -34,7 +43,8 @@ export type Space = {
     contribution: Parallel,
     concat: MetricValue[],
     anomalyFilter: boolean[],
-    contributionFilter: boolean[]
+    contributionFilter: boolean[],
+    heatmap: Heatmap,
 };
 
 export const DEFAULT_SPACE: Space = {
@@ -52,5 +62,6 @@ export const DEFAULT_SPACE: Space = {
     },
     concat: [],
     anomalyFilter: [true, true, true, true, true, true],
-    contributionFilter: [true, true, true, true]
+    contributionFilter: [true, true, true, true],
+    heatmap: []
 };

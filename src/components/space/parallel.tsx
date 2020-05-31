@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import * as d3 from 'd3';
-import { State, Parallel, MetricValue } from '../../types';
+import { State, Parallel, MetricValue, SpaceType } from '../../types';
 import { Select, OptionProps } from '../utils/select';
 
 import './parallel.css';
@@ -11,7 +11,7 @@ import { UtilsAction, SET_HIGHLIGHT_CLIENT } from '../../actions/utils';
 
 export interface ParallelProps extends ActionHandler<SpaceAction | UtilsAction> {
   title: string,
-  id: 'contribution' | 'anomaly',
+  id: SpaceType,
   data: Parallel,
   width: number,
   color: string,
@@ -32,7 +32,7 @@ function ParallelPaneBase(props: ParallelProps): JSX.Element {
     newCurMetrics[index] = !newCurMetrics[index];
     setcurMetrics(newCurMetrics);
     props.handleAction({
-      type: props.id === 'anomaly' ? SET_ANOMALY_FILTER : SET_CONTRIBUTION_FILTER,
+      type: props.id === SpaceType.Anomaly ? SET_ANOMALY_FILTER : SET_CONTRIBUTION_FILTER,
       payload: {
         filter: curMetrics
       }
