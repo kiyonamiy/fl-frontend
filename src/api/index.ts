@@ -62,7 +62,7 @@ export const getSniper = ({p=0.8, round=-1, layers=['dense']}) => {
     })
 };
 
-export const getPca = ({k=10, round=-1, layers=['dense']}) => {
+export const getPca = ({k=5, round=-1, layers=['dense']}) => {
     return axios.get('anomaly/pca/', {
         params: {
             k: k,
@@ -98,5 +98,30 @@ export const getContributionPerformance = ({round=-1, metric='accuracy', layers=
         paramsSerializer: params => {
             return qs.stringify(params)
           }
+    })
+};
+
+export const getGradient = ({round=-1, avg=false}) => {
+    return axios.get(avg ? 'avg_grad' : 'client_grad/', {
+        params: {
+            round: round
+        }
+    });
+}
+
+export const getOneRoundMetrics = ({round=-1, layers=['dense']}) => {
+    return axios.get('one_round_metrics/', {
+        params: {
+            round: round,
+            layers: layers
+        },
+    })
+};
+
+export const getAllRoundMetrics = ({layers=['dense']}) => {
+    return axios.get('all_round_metrics/', {
+        params: {
+            layers: layers
+        },
     })
 };

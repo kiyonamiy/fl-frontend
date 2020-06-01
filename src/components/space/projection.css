@@ -1,0 +1,16 @@
+.projection-view {
+    width: 400px;
+    height: 100%;
+    margin: 5px;
+}
+
+.projection-svg {
+    width: 100%;
+    height: 300px;
+}
+
+.projection-svg circle {
+    fill: #999;
+    stroke: none;
+    cursor: pointer;
+}
