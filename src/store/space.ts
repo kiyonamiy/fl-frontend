@@ -1,8 +1,10 @@
 import { Space, DEFAULT_SPACE } from "../types";
-import { SpaceAction, SET_ANOMALY_SPACE, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE, SET_ANOMALY_FILTER, SET_CONTRIBUTION_FILTER, SET_SPACE_TOP_K, SET_SPACE_HEATMAP } from "../actions";
+import { SpaceAction, SET_ANOMALY_SPACE, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE, SET_ANOMALY_FILTER, SET_CONTRIBUTION_FILTER, SET_SPACE_TOP_K, SET_SPACE_HEATMAP, SET_SPACE_ROUND } from "../actions";
 
 export const spaceReducer = (state: Space = DEFAULT_SPACE, action: SpaceAction): Space => {
     switch (action.type) {
+        case SET_SPACE_ROUND:
+            return {...state, round: action.payload.round};
         case SET_ANOMALY_SPACE:
             return {...state, anomaly: action.payload.anomaly};
         case SET_CONTRIBUTION_SPACE:

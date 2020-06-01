@@ -37,6 +37,7 @@ export interface HeatmapMetrics {
 export type Heatmap = HeatmapMetrics[];
 
 export type Space = {
+    round: number,
     K: number,
     clients: number[],
     anomaly: Parallel,
@@ -48,6 +49,7 @@ export type Space = {
 };
 
 export const DEFAULT_SPACE: Space = {
+    round: -1,
     K: 5,
     clients: [],
     anomaly: {

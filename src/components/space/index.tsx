@@ -15,7 +15,7 @@ export interface SpaceProps extends ActionHandler<SpaceAction> {
 function SpacePaneBase(props: SpaceProps): JSX.Element {
   return (  
     <div className='Frame SpaceView'>
-        <button style={{    position: 'absolute',
+        {/* <button style={{    position: 'absolute',
     top: 0}} onClick={() => {
           props.handleAction({
             type: SET_SPACE_ROUND,
@@ -23,7 +23,7 @@ function SpacePaneBase(props: SpaceProps): JSX.Element {
               round: 50
             }
           });
-        }}>Test</button>
+        }}>Test</button> */}
       <div className='space-up-div'>
         <ParallelPane 
           title='Contribution Space'

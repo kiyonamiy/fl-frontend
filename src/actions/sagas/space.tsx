@@ -1,7 +1,7 @@
 import { call, put, all, takeLatest, select } from 'redux-saga/effects';
 import { SET_SPACE_ROUND, SetSpaceRound, SET_ANOMALY_SPACE, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE, SET_ANOMALY_FILTER, SET_CONTRIBUTION_FILTER, SetAnomalyFilter, SetContributionFilter, SET_SPACE_TOP_K, SetSpaceTopK, SetSPaceHeatmap, SET_SPACE_HEATMAP } from '../space';
 import { getGradient, getOneRoundMetrics, getAllRoundMetrics } from '../../api';
-import { getLayers, getClientNum, getRound, getAnomaly, getSpaceK, getHeatMap, getAnomalyFilter } from '../../components/utils/selector';
+import { getLayers, getClientNum, getSpaceRound, getAnomaly, getSpaceK, getHeatMap, getAnomalyFilter } from '../../components/utils/selector';
 import { Parallel, DEFAULT_ANOMALY_METRICS, DEFAULT_CONTRIBUTION_METRICS, DEFAULT_ANOMALY_SCALE, DEFAULT_CONTRIBUTION_SCALE, MetricValue, ClientValue, Weight, Heatmap } from '../../types';
 import { deepClone } from '../../components/utils/deepclone';
 import { SetGradient, SET_GRADIENT } from '../gradient';
@@ -80,7 +80,7 @@ function *resetHeatmap(): any {
 function* requestSpace(action: SetSpaceRound): any {
     const layers: string[] = yield select(getLayers);
     const clientNum = yield select(getClientNum);
-    const round = yield select(getRound);
+    const round = yield select(getSpaceRound);
     let spaceResult: any = yield call(getOneRoundMetrics, {round: round, layers: layers});
     spaceResult = spaceResult.data;
     const anomalyRes = transferSpaceData(spaceResult.slice(0, 6), DEFAULT_ANOMALY_METRICS, DEFAULT_ANOMALY_SCALE, clientNum);

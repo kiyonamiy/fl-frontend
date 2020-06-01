@@ -7,7 +7,7 @@ import { State, Heatmap, MetricValue, SpaceType } from '../../types';
 
 import './heatmap.css';
 import { sumBoolean } from '../utils/math';
-import { getRound, getEndRound } from '../utils/selector';
+import { getSpaceRound, getEndRound } from '../utils/selector';
 import { sampleToFix } from '../utils/math';
 import { SubHeatmapPane } from './subHeatmap';
 
@@ -103,7 +103,7 @@ const mapStateToProps = (state: State) => ({
   clients: state.Space.clients,
   anomalyFilter: state.Space.anomalyFilter,
   contributionFilter: state.Space.contributionFilter,
-  round: getRound(state),
+  round: getSpaceRound(state),
   allRound: getEndRound(state)
 });
 export const HeatmapPane = connect(

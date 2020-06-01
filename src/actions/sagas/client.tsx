@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { call, put, takeLatest, select } from 'redux-saga/effects';
 import axios from 'axios';
 import {
   SCHEDULED_UPDATE_LATEST_ROUND,
@@ -15,6 +15,8 @@ import {
   DISPLAY_ROUND_INPUT_CHANGE
 } from '../client';
 import { Performance, RoundRes, ClientRes } from '../../types';
+import { getSpaceRound, getAuto, getManuRound } from '../../components/utils/selector';
+import { SET_SPACE_ROUND, SetSpaceRound } from '../space';
 
 const DEFAULT_PERFORMANCE_NUMBER = 5;
 
@@ -132,6 +134,18 @@ function* displayRoundInputChangeAsync(action: DisplayRoundInputChangeAction) {
       }
     };
     yield put(errorAction);
+  }
+  const auto = yield select(getAuto);
+  const manuRound = yield select(getManuRound);
+  const spaceRound = yield select(getSpaceRound);
+  if (auto === false && manuRound != spaceRound) {
+    const spaceRoundAction: SetSpaceRound = {
+      type: SET_SPACE_ROUND,
+      payload: {
+        round: manuRound
+      }
+    };
+    yield put(spaceRoundAction);
   }
 }
 
