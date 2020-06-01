@@ -69,10 +69,14 @@ export default function(props: DendrogramProps): JSX.Element {
         left: divEle.clientWidth * 0.04
       }
     };
-    // 每个长方形的ID前缀
-    const RECT_ID_PREFIX = 'client-rect-';
+    // 连线、server 节点、rect 底色
+    const BASIC_COLOR = '#D8D8D8';
     // 连线长方形的 class
     const RECT_DISPLAY_CLASS = 'client-rect-display';
+    // 连线 class
+    const CURVE_CLASS = 'path-curve';
+    // container ID
+    const CLIENTS_CONTAINER_ID = 'clients-container';
     // 最外层的 svg 的 margin
     const margin = {
       top: 0 * divEle.clientHeight,
@@ -106,6 +110,12 @@ export default function(props: DendrogramProps): JSX.Element {
       height: divEle.clientHeight * 0.93
     };
 
+    const getRectId = (rect: ClientRect) => `client-rect-${rect.clientId}`;
+    const getRectTopPosY = (index: number) =>
+      clientRectSize.margin.top +
+      (clientRectSize.margin.top + clientRectSize.height + clientRectSize.margin.bottom) * index;
+    const getRectCenterPosY = (index: number) => getRectTopPosY(index) + clientRectSize.height / 2;
+    const getRectBottomPosY = (index: number) => getRectTopPosY(index) + clientRectSize.height;
     const svg = d3
       .select(divEle)
       .append('svg')
@@ -120,7 +130,7 @@ export default function(props: DendrogramProps): JSX.Element {
       .attr('cx', serverCircle.cx)
       .attr('cy', serverCircle.cy)
       .attr('r', serverCircle.r)
-      .attr('fill', '#D8D8D8');
+      .attr('fill', BASIC_COLOR);
     svg
       .append('text')
       .text('Server')
@@ -134,15 +144,16 @@ export default function(props: DendrogramProps): JSX.Element {
       .attr('y', 16);
 
     // 添加容纳所有的 client 的 div svg（长宽设置）
-    const containerSvg = d3
+    const containerDiv = d3
       .select(divEle)
       .append('div')
-      .attr('id', 'clients-container')
+      .attr('id', CLIENTS_CONTAINER_ID)
       .style('position', 'absolute')
       .style('top', `${clientsContainerSize.top}px`)
       .style('left', `${clientsContainerSize.left}px`)
       .style('width', `${clientsContainerSize.width}px`)
-      .style('height', `${clientsContainerSize.height}px`)
+      .style('height', `${clientsContainerSize.height}px`);
+    const containerSvg = containerDiv
       .append('svg')
       .attr('width', '100%')
       .attr(
@@ -157,33 +168,22 @@ export default function(props: DendrogramProps): JSX.Element {
       .data(clientRectArray)
       .join('g');
 
-    gs.append('rect')
-      .attr('class', (d, i) => {
+    const clientRects = gs
+      .append('rect')
+      .attr('class', (d, i) =>
         // 长方形顶点所在高度，判断是否出现在可视窗口的高度内来分配 class；通过判断这个 class 来确定是否连线
-        const rectY =
-          clientRectSize.margin.top +
-          (clientRectSize.margin.top + clientRectSize.height + clientRectSize.margin.bottom) * i;
-        return rectY >= 0 &&
-          rectY <= (document.querySelector('#clients-container')?.clientHeight || 0)
-          ? RECT_DISPLAY_CLASS
-          : '';
-      })
-      .attr('id', (d) => `${RECT_ID_PREFIX}${d.clientId}`)
+        getRectTopPosY(i) <= clientsContainerSize.height ? RECT_DISPLAY_CLASS : null
+      )
+      .attr('id', (d) => getRectId(d))
       .attr('width', clientRectSize.width)
       .attr('height', clientRectSize.height)
       .attr('x', clientRectSize.margin.left)
-      .attr(
-        'y',
-        (d, i) =>
-          clientRectSize.margin.top +
-          (clientRectSize.margin.top + clientRectSize.height + clientRectSize.margin.bottom) * i
-      )
-      .attr('fill', '#D8D8D8');
+      .attr('y', (d, i) => getRectTopPosY(i))
+      .attr('fill', BASIC_COLOR);
 
     // 在每一个长方形添加五个圆形
     const minRound = d3.min(clientRectArray, (d) => d.rounds[0]) || 0;
     const maxRound = d3.max(clientRectArray, (d) => d.rounds[d.rounds.length - 1]) || 0;
-    console.log(minRound, maxRound);
     const circleX = d3
       .scaleLinear()
       .domain([minRound, maxRound])
@@ -201,14 +201,7 @@ export default function(props: DendrogramProps): JSX.Element {
       .join('circle')
       .attr('r', CLIENT_CIRCLE_RADIUS)
       .attr('cx', (d) => circleX(d.round))
-      .attr(
-        'cy',
-        (d) =>
-          clientRectSize.margin.top +
-          clientRectSize.height / 2 +
-          (clientRectSize.margin.top + clientRectSize.height + clientRectSize.margin.bottom) *
-            d.clientIndex
-      )
+      .attr('cy', (d) => getRectCenterPosY(d.clientIndex))
       .attr('fill', (d) => {
         return colorScale((d.round - minRound) / (maxRound - minRound));
       });
@@ -219,8 +212,9 @@ export default function(props: DendrogramProps): JSX.Element {
       .selectAll()
       .data(clientRectArray)
       .join('path')
+      .attr('class', CURVE_CLASS)
       .attr('d', (d: ClientRect, i) => {
-        const rectClass = d3.select(`#${RECT_ID_PREFIX}${d.clientId}`).attr('class');
+        const rectClass = d3.select(`#${getRectId(d)}`).attr('class');
         if (rectClass !== RECT_DISPLAY_CLASS) {
           return null;
         }
@@ -228,12 +222,7 @@ export default function(props: DendrogramProps): JSX.Element {
         const startX = serverCircle.cx + serverCircle.r,
           startY = serverCircle.cy;
         const endX = clientsContainerSize.left,
-          endY =
-            0.06 * divEle.clientHeight -
-            margin.top +
-            clientRectSize.margin.top +
-            clientRectSize.height / 2 +
-            (clientRectSize.margin.top + clientRectSize.height + clientRectSize.margin.bottom) * i;
+          endY = clientsContainerSize.top - margin.top + getRectCenterPosY(i);
 
         const xi = d3.interpolateNumber(startX, endX),
           curvature = 0.7;
@@ -241,8 +230,85 @@ export default function(props: DendrogramProps): JSX.Element {
           x2 = xi(1 - curvature);
         return `M${startX},${startY}C${x1},${startY} ${x2},${endY} ${endX},${endY}`;
       })
-      .attr('stroke', '#D8D8D8')
+      .attr('stroke', BASIC_COLOR)
       .attr('fill', 'none');
+
+    // 监听滑动条滚动，重新对应绘制连线
+    // const containerDivEle = document.querySelector(`#${CLIENTS_CONTAINER_ID}`);
+    // const containerSVGEle = document.querySelector(`#${CLIENTS_CONTAINER_ID} svg`);
+
+    // containerDiv.on('mousewheel', () => {
+    //   // 能取到滚动高度就更简单了。
+    //   d3.selectAll(`.${CURVE_CLASS}`).remove();
+    //   clientRects.attr('class', (d, index) => {
+    //     // const rectBound = document.querySelector(`#${getRectId(d)}`)?.getBoundingClientRect();
+    //     // const containerDivBound = containerDivEle?.getBoundingClientRect();
+    //     // // 不在视野内
+    //     // if (
+    //     //   rectBound == null ||
+    //     //   containerDivBound == null ||
+    //     //   rectBound.bottom <= containerDivBound.top ||
+    //     //   rectBound.top >= containerDivBound.bottom
+    //     // ) {
+    //     //   if (rectBound == null || containerDivBound == null) {
+    //     //   } else if (rectBound.bottom <= containerDivBound.top) {
+    //     //     console.log(
+    //     //       d.clientId,
+    //     //       '出去了！',
+    //     //       'rect-bottom',
+    //     //       rectBound.bottom,
+    //     //       '<=',
+    //     //       'container-top',
+    //     //       containerDivBound.top
+    //     //     );
+    //     //   } else if (rectBound.top >= containerDivBound.bottom) {
+    //     //     console.log(
+    //     //       d.clientId,
+    //     //       '还没出现！',
+    //     //       'rect-top',
+    //     //       rectBound.top,
+    //     //       '>=',
+    //     //       'container-bottom',
+    //     //       containerDivBound.bottom
+    //     //     );
+    //     //   }
+    //     //   return null;
+    //     // }
+    //     // console.log(d.clientId, '在展示！', rectBound.top);
+    //     // return RECT_DISPLAY_CLASS;
+
+    //   // svg
+    //   //   .append('g')
+    //   //   .selectAll()
+    //   //   .data(clientRectArray)
+    //   //   .join('path')
+    //   //   .attr('class', CURVE_CLASS)
+    //   //   .attr('d', (d: ClientRect, i) => {
+    //   //     const rectClass = d3.select(`#${getRectId(d)}`).attr('class');
+    //   //     if (rectClass !== RECT_DISPLAY_CLASS) {
+    //   //       return null;
+    //   //     }
+    //   //     const containerDivBound = containerDivEle?.getBoundingClientRect();
+    //   //     const containerSVGBound = containerSVGEle?.getBoundingClientRect();
+    //   //     if (containerDivBound == null || containerSVGBound == null) {
+    //   //       return null;
+    //   //     }
+    //   //     const relativeYDistance = containerSVGBound.top - containerDivBound.top;
+    //   //     console.log(relativeYDistance);
+    //   //     const startX = serverCircle.cx + serverCircle.r,
+    //   //       startY = serverCircle.cy;
+    //   //     const endX = clientsContainerSize.left,
+    //   //       endY = clientsContainerSize.top - margin.top + getRectCenterPosY(i) + relativeYDistance;
+
+    //   //     const xi = d3.interpolateNumber(startX, endX),
+    //   //       curvature = 0.7;
+    //   //     const x1 = xi(curvature),
+    //   //       x2 = xi(1 - curvature);
+    //   //     return `M${startX},${startY}C${x1},${startY} ${x2},${endY} ${endX},${endY}`;
+    //   //   })
+    //   //   .attr('stroke', BASIC_COLOR)
+    //   //   .attr('fill', 'none');
+    // });
   }, [props.performance]);
 
   return <div ref={divRef} style={{ width: '100%', height: '100%', position: 'relative' }} />;

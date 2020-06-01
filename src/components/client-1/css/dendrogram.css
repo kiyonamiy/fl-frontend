@@ -25,3 +25,7 @@
 /*滚动条右下角区域*/
 #clients-container::-webkit-scrollbar-corner {
 }
+
+/* .client-rect-display {
+  fill: red;
+} */

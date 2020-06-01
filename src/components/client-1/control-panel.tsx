@@ -77,7 +77,7 @@ export default function(props: ControlPanelProps): JSX.Element {
         checkedChildren="Auto"
         unCheckedChildren="Manu"
         checked={props.auto}
-        style={{ width: 60 }}
+        style={{ width: 70 }}
         onClick={() => {
           props.setAuto(!props.auto);
         }}
