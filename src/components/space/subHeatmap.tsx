@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import * as d3 from 'd3';
 import { ActionHandler, createDispatchHandler } from '../../actions/redux-action';
-import { UtilsAction } from '../../actions';
+import { UtilsAction, SET_HIGHLIGHT_ROUND, SET_HIGHLIGHT_CLIENT } from '../../actions';
 import { MetricValue, SpaceType } from '../../types';
 import { connect } from 'react-redux';
 
@@ -17,7 +17,7 @@ export interface SubHeatMapProps extends ActionHandler<UtilsAction> {
 function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
   const {data, round, id, clients, stringSample, roundIndex} = props;
   const stringClients = clients.map(v => 'client-' + v);
-  const width = 1150;
+  const width = 1000;
   const height = 170;
 
   const x = d3.scaleBand()
@@ -36,7 +36,7 @@ function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
     svg.selectAll('*').remove();
     data.forEach(client => {
       const g = svg.append('g')
-        .attr('class', `heatmap-client-${client.id}`);
+        .attr('class', `heatmap-group heatmap-client-${client.id}`);
       const clientRound = stringSample.map((v, i) => {
         if (i === roundIndex - 1 || i === roundIndex  + 1)
             return id === SpaceType.Anomaly ? 0 : -1;
@@ -63,8 +63,29 @@ function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
         <p>{id == SpaceType.Anomaly ? 'Anomaly' : 'Contribution'}</p>
       </div>
       <div className='sub-heatmap-round'>
-        {clients.map(v => {
-          <p key={v}>{`Round ${v}`}</p>
+        {clients.map((v, i) => {
+          return (
+            <p key={v} style={{position: 'absolute', top: y('client-' + v), height: stepHeight, lineHeight: stepHeight + 'px'}}
+              onMouseEnter={() => {
+                props.handleAction({
+                  type: SET_HIGHLIGHT_CLIENT,
+                  payload: {
+                    client: v
+                  }
+                })
+              }}
+              onMouseLeave={() => {
+                props.handleAction({
+                  type: SET_HIGHLIGHT_CLIENT,
+                  payload: {
+                    client: -1
+                  }
+                })
+              }}
+            >
+              {`Client ${v}`}
+            </p>
+          );
         })}
       </div>
       <div>

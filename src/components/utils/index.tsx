@@ -12,6 +12,8 @@ const unfocusFunc = () => {
     d3.select('#parallel-anomaly').selectAll('path').style('opacity', '0.2');
     d3.select('#parallel-contribution').selectAll('path').style('opacity', '0.2');
     d3.selectAll('.line-chart-svg').selectAll('path').style('opacity', '0.2');
+    d3.selectAll('#anomaly-heatmap').selectAll('.heatmap-group').style('opacity', '0.2');
+        d3.selectAll('#contribution-heatmap').selectAll('.heatmap-group').style('opacity', '0.2');
 };
 
 const focusFunc = (ids: number[], all=false) => {
@@ -20,13 +22,16 @@ const focusFunc = (ids: number[], all=false) => {
         d3.select('#parallel-anomaly').selectAll('path').style('opacity', '0.5');
         d3.select('#parallel-contribution').selectAll('path').style('opacity', '0.5');
         d3.selectAll('.line-chart-svg').selectAll('path').style('opacity', '1.0');
-        return;
+        d3.selectAll('#anomaly-heatmap').selectAll('.heatmap-group').style('opacity', '1.0');
+        d3.selectAll('#contribution-heatmap').selectAll('.heatmap-group').style('opacity', '1.0');
     }
     ids.forEach(id => {
         d3.select('.projection-svg').select(`.projection-client-${id}`).classed('unfocus', false);
         d3.select('#parallel-anomaly').select(`.parallel-anomaly-client-${id}`).style('opacity', '1.0');
         d3.select('#parallel-contribution').selectAll(`.parallel-contribution-client-${id}`).style('opacity', '1.0');
         d3.selectAll('.line-chart-svg').selectAll(`.gradient-${id}`).style('opacity', '1.0');
+        d3.selectAll('#anomaly-heatmap').selectAll(`.heatmap-client-${id}`).style('opacity', '1.0');
+        d3.selectAll('#contribution-heatmap').selectAll(`.heatmap-client-${id}`).style('opacity', '1.0');
     });
 };
 

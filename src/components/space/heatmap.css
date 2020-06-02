@@ -24,7 +24,24 @@
 .sub-heatmap-title p {
     padding: 5px;
 }
+
+.sub-heatmap-round {
+    position: relative;
+    width: 100px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.sub-heatmap-round p {
+    width: 100%;
+}
+
+.sub-heatmap-round p:hover {
+    cursor: pointer;
+}
+
 .sub-heatmap-svg{
-    width: 1150px;
+    width: 1000px;
     height: 170px;
 }
