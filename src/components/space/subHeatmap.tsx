@@ -62,6 +62,11 @@ function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
         <p>History</p>
         <p>{id == SpaceType.Anomaly ? 'Anomaly' : 'Contribution'}</p>
       </div>
+      <div className='sub-heatmap-round'>
+        {clients.map(v => {
+          <p key={v}>{`Round ${v}`}</p>
+        })}
+      </div>
       <div>
         <svg className='sub-heatmap-svg' id={svgId}>
         </svg>
