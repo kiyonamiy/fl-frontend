@@ -27,6 +27,7 @@ export default function AppPane(): JSX.Element {
       <div className="Frame ClientView">
         <Client />
       </div>
+      <SpacePane />
       <div className="Frame ModelView">
         <ModelInfo />
       </div>
