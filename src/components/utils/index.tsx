@@ -13,7 +13,7 @@ const unfocusFunc = () => {
     d3.select('#parallel-contribution').selectAll('path').style('opacity', '0.2');
     d3.selectAll('.line-chart-svg').selectAll('path').style('opacity', '0.2');
     d3.selectAll('#anomaly-heatmap').selectAll('.heatmap-group').style('opacity', '0.2');
-        d3.selectAll('#contribution-heatmap').selectAll('.heatmap-group').style('opacity', '0.2');
+    d3.selectAll('#contribution-heatmap').selectAll('.heatmap-group').style('opacity', '0.2');
 };
 
 const focusFunc = (ids: number[], all=false) => {
@@ -24,6 +24,7 @@ const focusFunc = (ids: number[], all=false) => {
         d3.selectAll('.line-chart-svg').selectAll('path').style('opacity', '1.0');
         d3.selectAll('#anomaly-heatmap').selectAll('.heatmap-group').style('opacity', '1.0');
         d3.selectAll('#contribution-heatmap').selectAll('.heatmap-group').style('opacity', '1.0');
+        return;
     }
     ids.forEach(id => {
         d3.select('.projection-svg').select(`.projection-client-${id}`).classed('unfocus', false);
@@ -35,24 +36,56 @@ const focusFunc = (ids: number[], all=false) => {
     });
 };
 
+const unfocusRound = () => {
+    d3.selectAll('#anomaly-heatmap').selectAll('rect').style('opacity', '0.2');
+    d3.selectAll('#contribution-heatmap').selectAll('rect').style('opacity', '0.2');
+}
+
+const focusRoundFunc = (clients: number[], id: number, all=false) => {
+    if (all) {
+        d3.selectAll('#anomaly-heatmap').selectAll('rect').style('opacity', '1.0');
+        d3.selectAll('#contribution-heatmap').selectAll('rect').style('opacity', '1.0');
+        return;
+    }
+    clients.forEach(client => {
+        d3.selectAll('#anomaly-heatmap').selectAll(`.rect-client-${client}-round${id}`).style('opacity', '1.0');
+        d3.selectAll('#contribution-heatmap').selectAll(`.rect-client-${client}-round${id}`).style('opacity', '1.0');
+    });
+}
 export interface UtilsProps extends ActionHandler<UtilsAction> {
     client: number,
-    preClient: number
+    preClient: number,
+    round: number,
+    preRound: number,
+    clients: number[]
 };
 function UtilsPaneBase(props: UtilsProps): JSX.Element {
-    if (props.client === -1) {
-        focusFunc([], true);
+    if (props.client !== props.preClient) {
+        if (props.client === -1) {
+            focusFunc([], true);
+        }
+        else if (props.client >= 0) {
+            unfocusFunc();
+            focusFunc([props.client]);
+        }
     }
-    else if (props.client >= 0) {
-        unfocusFunc();
-        focusFunc([props.client]);
+    if (props.round !== props.preRound) {
+        if (props.round === -1)
+            focusRoundFunc([], 0, true);
+        else if (props.round >= 0) {
+            unfocusRound();
+            focusRoundFunc(props.clients, props.round);
+        }
     }
     return <div></div>;
 }
 
 const mapStateToProps = (state: State) => ({
     client: state.Utils.client,
-    preClient: state.Utils.preClient
+    preClient: state.Utils.preClient,
+    round: state.Utils.round,
+    preRound: state.Utils.preRound,
+    clients: state.Space.clients
 });
 export const UtilsPane = connect(
     mapStateToProps,

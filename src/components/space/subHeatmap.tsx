@@ -52,7 +52,25 @@ function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
           .attr('x', (v: number, i: number) => x(stringSample[i]))
           .attr('width', stepWidth)
           .attr('height', stepHeight)
-          .attr('fill', (v: number) => props.colorMap(v));
+          .attr('fill', (v: number) => props.colorMap(v))
+          .on('mouseover', (v: number, i: number) => {
+            if (stringSample.includes('fix'))
+              return;
+            props.handleAction({
+              type: SET_HIGHLIGHT_ROUND,
+              payload: {
+                round: +stringSample[i]
+              }
+            });
+          })
+          .on('mouseleave', () => {
+            props.handleAction({
+              type: SET_HIGHLIGHT_ROUND,
+              payload: {
+                round: -1
+              }
+            });
+          })
     });
 
   }, [data, round, clients]);
