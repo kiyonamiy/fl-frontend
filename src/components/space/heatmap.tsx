@@ -27,7 +27,7 @@ function HeatmapPaneBase(props: HeatMapProps): JSX.Element {
   const contributData: MetricValue[] = [];
   const anomalyNum = Math.max(1, sumBoolean(anomalyFilter));
   const contributionNum = Math.max(1, sumBoolean(contributionFilter));
-  if (heatmap.length === 0)
+  if (heatmap.length === 0 || clients.length === 0)
     return <div></div>;
 
   clients.forEach(id => {
@@ -92,9 +92,11 @@ function HeatmapPaneBase(props: HeatMapProps): JSX.Element {
         colorMap={anomalyColorMap}
       />
       <div className='heatmap-round-div'>
-        <div className='heatmap-round-show' style={{left: roundLeft}}>
+        <p className='heatmap-round-show heatmap-round-tooltip' style={{left: 0}}>
+        </p>
+        <p className='heatmap-round-show heatmap-round-default' style={{left: roundLeft}}>
           {`Round ${stringSample[roundIndex]}`}
-        </div>
+        </p>
       </div>
       <SubHeatmapPane 
         data={contributData}

@@ -1,7 +1,7 @@
 import React from 'react';
 import * as d3 from 'd3';
 import { connect } from 'react-redux';
-import { State } from '../../types';
+import { State, Utils } from '../../types';
 import { createDispatchHandler, ActionHandler } from '../../actions/redux-action';
 import { UtilsAction } from '../../actions/utils';
 
@@ -39,53 +39,54 @@ const focusFunc = (ids: number[], all=false) => {
 const unfocusRound = () => {
     d3.selectAll('#anomaly-heatmap').selectAll('rect').style('opacity', '0.2');
     d3.selectAll('#contribution-heatmap').selectAll('rect').style('opacity', '0.2');
+    d3.select('.heatmap-round-default').style('opacity', 0.3);
 }
 
-const focusRoundFunc = (clients: number[], id: number, all=false) => {
+const focusRoundFunc = (clients: number[], id: number, left: number, all=false) => {
     if (all) {
         d3.selectAll('#anomaly-heatmap').selectAll('rect').style('opacity', '1.0');
         d3.selectAll('#contribution-heatmap').selectAll('rect').style('opacity', '1.0');
+        d3.select('.heatmap-round-tooltip').html('');
+        d3.select('.heatmap-round-default').style('opacity', 1.0);
         return;
     }
+    d3.select('.heatmap-round-tooltip')
+        .style('left', left + 'px')
+        .html(`Round ${id}`);
     clients.forEach(client => {
         d3.selectAll('#anomaly-heatmap').selectAll(`.rect-client-${client}-round${id}`).style('opacity', '1.0');
         d3.selectAll('#contribution-heatmap').selectAll(`.rect-client-${client}-round${id}`).style('opacity', '1.0');
     });
 }
 export interface UtilsProps extends ActionHandler<UtilsAction> {
-    client: number,
-    preClient: number,
-    round: number,
-    preRound: number,
+    utils: Utils,
     clients: number[]
 };
 function UtilsPaneBase(props: UtilsProps): JSX.Element {
-    if (props.client !== props.preClient) {
-        if (props.client === -1) {
+    const {client, preClient, round, preRound, left} = props.utils;
+    if (client !== preClient) {
+        if (client === -1) {
             focusFunc([], true);
         }
-        else if (props.client >= 0) {
+        else if (client >= 0) {
             unfocusFunc();
-            focusFunc([props.client]);
+            focusFunc([client]);
         }
     }
-    if (props.round !== props.preRound) {
-        if (props.round === -1)
-            focusRoundFunc([], 0, true);
-        else if (props.round >= 0) {
+    if (round !== preRound) {
+        if (round === -1)
+            focusRoundFunc([], 0, 0, true);
+        else if (round >= 0) {
             unfocusRound();
-            focusRoundFunc(props.clients, props.round);
+            focusRoundFunc(props.clients, round, left);
         }
     }
     return <div></div>;
 }
 
 const mapStateToProps = (state: State) => ({
-    client: state.Utils.client,
-    preClient: state.Utils.preClient,
-    round: state.Utils.round,
-    preRound: state.Utils.preRound,
-    clients: state.Space.clients
+    utils: state.Utils,
+    clients: state.Space.clients,
 });
 export const UtilsPane = connect(
     mapStateToProps,

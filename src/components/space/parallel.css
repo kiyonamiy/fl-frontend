@@ -5,6 +5,8 @@
 }
 
 .parallel-title {
+    height: 25px;
+    line-height: 25px;
     font-size: 18px;
     font-weight: bold;
     margin-left: 7px;

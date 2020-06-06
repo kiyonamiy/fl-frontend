@@ -9,5 +9,6 @@ export type SetHighlightClient = ReduxAction<typeof SET_HIGHLIGHT_CLIENT, {
 
 export const SET_HIGHLIGHT_ROUND = 'SET_HIGHLIGHT_ROUND';
 export type SetHightlightRound = ReduxAction<typeof SET_HIGHLIGHT_ROUND, {
-    round: number
+    round: number,
+    left?: number
 }>;

@@ -83,7 +83,7 @@ function ProjectionPaneBase(props: ProjectionProps): JSX.Element {
   const yArray = coordinates.map(v => v[1]);
 
   const margin = 5,
-        height = 300,
+        height = 290,
         width = 400;
   const x = d3.scaleLinear()
   // @ts-ignore

@@ -59,7 +59,8 @@ function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
             props.handleAction({
               type: SET_HIGHLIGHT_ROUND,
               payload: {
-                round: +stringSample[i]
+                round: +stringSample[i],
+                left:  (x(stringSample[i]) as any) + stepWidth / 2 - 40,
               }
             });
           })
@@ -67,7 +68,7 @@ function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
             props.handleAction({
               type: SET_HIGHLIGHT_ROUND,
               payload: {
-                round: -1
+                round: -1,
               }
             });
           })
