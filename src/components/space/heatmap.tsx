@@ -74,6 +74,12 @@ function HeatmapPaneBase(props: HeatMapProps): JSX.Element {
       stringSample.push('' + v);
     }
   });
+  const x = d3.scaleBand()
+      .range([0, 1000])
+      .domain(stringSample)
+      .padding(0.1);
+  const stepWidth = x.bandwidth();
+  const roundLeft: string = (x(stringSample[roundIndex]) as any) + stepWidth / 2 - 40 + 'px';
   return (
     <div className='heatmap-div'>
       <SubHeatmapPane 
@@ -85,6 +91,11 @@ function HeatmapPaneBase(props: HeatMapProps): JSX.Element {
         clients={clients}
         colorMap={anomalyColorMap}
       />
+      <div className='heatmap-round-div'>
+        <div className='heatmap-round-show' style={{left: roundLeft}}>
+          {`Round ${stringSample[roundIndex]}`}
+        </div>
+      </div>
       <SubHeatmapPane 
         data={contributData}
         round={round}

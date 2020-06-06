@@ -1,29 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { State, Space, SpaceType } from '../../types';
 import { createDispatchHandler, ActionHandler } from "../../actions/redux-action";
-import { SpaceAction, SET_SPACE_ROUND } from '../../actions';
+import { SpaceAction, SET_SPACE_ROUND, SET_MODEL_LAYERS, ModelAction } from '../../actions';
 import { ParallelPane } from './parallel';
 
 import './space.css';
 import { ProjectionPane } from './projection';
 import { HeatmapPane } from './heatmap';
-export interface SpaceProps extends ActionHandler<SpaceAction> {
+export interface SpaceProps extends ActionHandler<SpaceAction | ModelAction> {
   curRound: number,
   space: Space
 };
 function SpacePaneBase(props: SpaceProps): JSX.Element {
+  useEffect(() => {
+    props.handleAction({
+      type: SET_MODEL_LAYERS,
+      payload: {
+        layers: ['dense']
+      }
+    });
+  }, []);
   return (  
     <div className='Frame SpaceView'>
-        {/* <button style={{    position: 'absolute',
-    top: 0}} onClick={() => {
-          props.handleAction({
-            type: SET_SPACE_ROUND,
-            payload:{
-              round: 50
-            }
-          });
-        }}>Test</button> */}
       <div className='space-up-div'>
         <ParallelPane 
           title='Contribution Space'
@@ -47,7 +46,7 @@ function SpacePaneBase(props: SpaceProps): JSX.Element {
       </div>
       
       <div className='space-down-div'>
-        <HeatmapPane></HeatmapPane>
+        <HeatmapPane />
       </div>
     </div>
   );
@@ -59,5 +58,5 @@ const mapStateToProps = (state: State) => ({
 });
 export const SpacePane = connect(
   mapStateToProps,
-  createDispatchHandler<SpaceAction>()
+  createDispatchHandler<SpaceAction | ModelAction>()
 )(SpacePaneBase);

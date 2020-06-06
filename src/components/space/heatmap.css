@@ -4,6 +4,18 @@
     width: 1245px;
 }
 
+.heatmap-round-div {
+    position: relative;
+    left: 200px;
+    height: 20px;
+}
+
+.heatmap-round-show {
+    position: absolute;
+    width: 80px;
+    text-align: center;
+    line-height: 20px;
+}
 
 .sub-heatmap-div {
     height: 170px;

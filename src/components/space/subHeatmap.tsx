@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import * as d3 from 'd3';
 import { ActionHandler, createDispatchHandler } from '../../actions/redux-action';
-import { UtilsAction, SET_HIGHLIGHT_ROUND, SET_HIGHLIGHT_CLIENT } from '../../actions';
+import { UtilsAction, SET_HIGHLIGHT_ROUND, SET_HIGHLIGHT_CLIENT, DISPLAY_ROUND_INPUT_CHANGE, ClientAction } from '../../actions';
 import { MetricValue, SpaceType } from '../../types';
 import { connect } from 'react-redux';
 
-export interface SubHeatMapProps extends ActionHandler<UtilsAction> {
+export interface SubHeatMapProps extends ActionHandler<UtilsAction | ClientAction> {
     data: MetricValue[],
     stringSample: string[],
     round: number,
@@ -71,6 +71,16 @@ function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
               }
             });
           })
+          .on('dblclick', (v: number, i: number) => {
+            if (stringSample.includes('fix'))
+              return;
+            props.handleAction({
+              type: DISPLAY_ROUND_INPUT_CHANGE,
+              payload: {
+                displayRound: parseInt(stringSample[i])
+              }
+            });
+          })
     });
 
   }, [data, round, clients]);
@@ -116,5 +126,5 @@ function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
 
 export const SubHeatmapPane = connect(
   null,
-  createDispatchHandler<UtilsAction>()
+  createDispatchHandler<UtilsAction | ClientAction>()
 )(SubHeatmapPaneBase);
