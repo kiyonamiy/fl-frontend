@@ -14,6 +14,8 @@ export interface LineChartProps extends ActionHandler<UtilsAction> {
 }
 function LineChartPaneBase(props: LineChartProps): JSX.Element {
     useEffect(() => {
+      if (props.data.length <= 0)
+        return;
       const width = 1000,
             height = 180;
       const margin = {top: 20, left: 50, right: 20, bottom: 20};

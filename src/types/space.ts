@@ -40,6 +40,7 @@ export type Space = {
     round: number,
     K: number,
     clients: number[],
+    savedClients: number[],
     anomaly: Parallel,
     contribution: Parallel,
     concat: MetricValue[],
@@ -52,6 +53,7 @@ export const DEFAULT_SPACE: Space = {
     round: -1,
     K: 5,
     clients: [],
+    savedClients: [],
     anomaly: {
         metrics: DEFAULT_ANOMALY_METRICS,
         scale: DEFAULT_ANOMALY_SCALE,

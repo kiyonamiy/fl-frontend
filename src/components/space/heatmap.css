@@ -4,6 +4,18 @@
     width: 1245px;
 }
 
+.heatmap-round-div {
+    position: relative;
+    left: 200px;
+    height: 20px;
+}
+
+.heatmap-round-show {
+    position: absolute;
+    width: 80px;
+    text-align: center;
+    line-height: 20px;
+}
 
 .sub-heatmap-div {
     height: 170px;
@@ -24,7 +36,28 @@
 .sub-heatmap-title p {
     padding: 5px;
 }
-.sub-heatmap-svg{
-    width: 1150px;
+
+.sub-heatmap-round {
+    position: relative;
+    width: 100px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.sub-heatmap-round p {
+    width: 100%;
+}
+
+.sub-heatmap-round p:hover {
+    cursor: pointer;
+}
+
+.sub-heatmap-svg {
+    width: 1000px;
     height: 170px;
+}
+
+.sub-heatmap-svg rect:hover {
+    cursor: pointer;
 }

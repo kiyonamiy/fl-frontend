@@ -27,7 +27,7 @@ function HeatmapPaneBase(props: HeatMapProps): JSX.Element {
   const contributData: MetricValue[] = [];
   const anomalyNum = Math.max(1, sumBoolean(anomalyFilter));
   const contributionNum = Math.max(1, sumBoolean(contributionFilter));
-  if (heatmap.length === 0)
+  if (heatmap.length === 0 || clients.length === 0)
     return <div></div>;
 
   clients.forEach(id => {
@@ -74,6 +74,12 @@ function HeatmapPaneBase(props: HeatMapProps): JSX.Element {
       stringSample.push('' + v);
     }
   });
+  const x = d3.scaleBand()
+      .range([0, 1000])
+      .domain(stringSample)
+      .padding(0.1);
+  const stepWidth = x.bandwidth();
+  const roundLeft: string = (x(stringSample[roundIndex]) as any) + stepWidth / 2 - 40 + 'px';
   return (
     <div className='heatmap-div'>
       <SubHeatmapPane 
@@ -85,6 +91,13 @@ function HeatmapPaneBase(props: HeatMapProps): JSX.Element {
         clients={clients}
         colorMap={anomalyColorMap}
       />
+      <div className='heatmap-round-div'>
+        <p className='heatmap-round-show heatmap-round-tooltip' style={{left: 0}}>
+        </p>
+        <p className='heatmap-round-show heatmap-round-default' style={{left: roundLeft}}>
+          {`Round ${stringSample[roundIndex]}`}
+        </p>
+      </div>
       <SubHeatmapPane 
         data={contributData}
         round={round}

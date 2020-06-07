@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import * as d3 from 'd3';
 import { ActionHandler, createDispatchHandler } from '../../actions/redux-action';
-import { UtilsAction } from '../../actions';
+import { UtilsAction, SET_HIGHLIGHT_ROUND, SET_HIGHLIGHT_CLIENT, DISPLAY_ROUND_INPUT_CHANGE, ClientAction } from '../../actions';
 import { MetricValue, SpaceType } from '../../types';
 import { connect } from 'react-redux';
 
-export interface SubHeatMapProps extends ActionHandler<UtilsAction> {
+export interface SubHeatMapProps extends ActionHandler<UtilsAction | ClientAction> {
     data: MetricValue[],
     stringSample: string[],
     round: number,
@@ -17,7 +17,7 @@ export interface SubHeatMapProps extends ActionHandler<UtilsAction> {
 function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
   const {data, round, id, clients, stringSample, roundIndex} = props;
   const stringClients = clients.map(v => 'client-' + v);
-  const width = 1150;
+  const width = 1000;
   const height = 170;
 
   const x = d3.scaleBand()
@@ -36,7 +36,7 @@ function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
     svg.selectAll('*').remove();
     data.forEach(client => {
       const g = svg.append('g')
-        .attr('class', `heatmap-client-${client.id}`);
+        .attr('class', `heatmap-group heatmap-client-${client.id}`);
       const clientRound = stringSample.map((v, i) => {
         if (i === roundIndex - 1 || i === roundIndex  + 1)
             return id === SpaceType.Anomaly ? 0 : -1;
@@ -52,7 +52,36 @@ function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
           .attr('x', (v: number, i: number) => x(stringSample[i]))
           .attr('width', stepWidth)
           .attr('height', stepHeight)
-          .attr('fill', (v: number) => props.colorMap(v));
+          .attr('fill', (v: number) => props.colorMap(v))
+          .on('mouseover', (v: number, i: number) => {
+            if (stringSample.includes('fix'))
+              return;
+            props.handleAction({
+              type: SET_HIGHLIGHT_ROUND,
+              payload: {
+                round: +stringSample[i],
+                left:  (x(stringSample[i]) as any) + stepWidth / 2 - 40,
+              }
+            });
+          })
+          .on('mouseleave', () => {
+            props.handleAction({
+              type: SET_HIGHLIGHT_ROUND,
+              payload: {
+                round: -1,
+              }
+            });
+          })
+          .on('dblclick', (v: number, i: number) => {
+            if (stringSample.includes('fix'))
+              return;
+            props.handleAction({
+              type: DISPLAY_ROUND_INPUT_CHANGE,
+              payload: {
+                displayRound: parseInt(stringSample[i])
+              }
+            });
+          })
     });
 
   }, [data, round, clients]);
@@ -61,6 +90,32 @@ function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
       <div className='sub-heatmap-title'>
         <p>History</p>
         <p>{id == SpaceType.Anomaly ? 'Anomaly' : 'Contribution'}</p>
+      </div>
+      <div className='sub-heatmap-round'>
+        {clients.map((v, i) => {
+          return (
+            <p key={v} style={{position: 'absolute', top: y('client-' + v), height: stepHeight, lineHeight: stepHeight + 'px'}}
+              onMouseEnter={() => {
+                props.handleAction({
+                  type: SET_HIGHLIGHT_CLIENT,
+                  payload: {
+                    client: v
+                  }
+                })
+              }}
+              onMouseLeave={() => {
+                props.handleAction({
+                  type: SET_HIGHLIGHT_CLIENT,
+                  payload: {
+                    client: -1
+                  }
+                })
+              }}
+            >
+              {`Client ${v}`}
+            </p>
+          );
+        })}
       </div>
       <div>
         <svg className='sub-heatmap-svg' id={svgId}>
@@ -72,5 +127,5 @@ function SubHeatmapPaneBase(props: SubHeatMapProps): JSX.Element {
 
 export const SubHeatmapPane = connect(
   null,
-  createDispatchHandler<UtilsAction>()
+  createDispatchHandler<UtilsAction | ClientAction>()
 )(SubHeatmapPaneBase);

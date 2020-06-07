@@ -8,9 +8,11 @@ export function sumBoolean(a: boolean[]): number {
 
 export function sampleToFix(larger: number, sample: number, fix?: number): number[] {
     const res = [];
-    if (larger <= sample)
-        for (let index = 0; index < sample; index++) 
+    if (larger <= sample) {
+        for (let index = 0; index < larger; index++) 
             res.push(index);
+        return res;
+    }
 
     const p = sample / larger;
     const mark = new Array(larger).fill(true);
