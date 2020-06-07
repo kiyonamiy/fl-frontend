@@ -25,10 +25,10 @@ function changeDisplayInputValue(
   }
   const value = parseInt(valueStr, 10);
   if (isNaN(value) || value > latestRound) {
-    displayRoundInputChange(latestRound);
+    // displayRoundInputChange(latestRound);
     setDisplayInput(latestRound.toString());
   } else {
-    displayRoundInputChange(value);
+    // displayRoundInputChange(value);
     setDisplayInput(value.toString());
   }
 }
@@ -70,6 +70,9 @@ export default function(props: ControlPanelProps): JSX.Element {
               props.displayRoundInputChange,
               props.setAuto
             );
+          }}
+          onPressEnter={() => {
+            props.displayRoundInputChange(parseInt(displayInput, 10));
           }}
         />
       </div>
