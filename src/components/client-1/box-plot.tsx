@@ -14,6 +14,51 @@ interface RoundBoxPlotData {
   lossRange: [number, number];
 }
 
+interface Point {
+  x: number;
+  y: number;
+}
+
+const CLASS_ACCURACY_G = 'CLASS_ACCURACY_G';
+const CLASS_ACCURACY_LINE = 'CLASS_ACCURACY_LINE';
+
+const CLASS_LOSS_G = 'CLASS_LOSS_G';
+const CLASS_LOSS_LINE = 'CLASS_LOSS_LINE';
+
+function mouseOver(chooseAccuracy: boolean) {
+  if (chooseAccuracy) {
+    d3.selectAll(`.${CLASS_ACCURACY_G}`).style('opacity', 1);
+    d3.selectAll(`.${CLASS_LOSS_G}`).style('opacity', 0);
+    d3.selectAll(`.${CLASS_ACCURACY_LINE}`).style('opacity', 1);
+    d3.selectAll(`.${CLASS_LOSS_LINE}`).style('opacity', 0);
+  } else {
+    d3.selectAll(`.${CLASS_ACCURACY_G}`).style('opacity', 0);
+    d3.selectAll(`.${CLASS_LOSS_G}`).style('opacity', 1);
+    d3.selectAll(`.${CLASS_ACCURACY_LINE}`).style('opacity', 0);
+    d3.selectAll(`.${CLASS_LOSS_LINE}`).style('opacity', 1);
+  }
+}
+
+function mouseOut() {
+  d3.selectAll(`.${CLASS_ACCURACY_G}`).style('opacity', 1);
+  d3.selectAll(`.${CLASS_LOSS_G}`).style('opacity', 1);
+  d3.selectAll(`.${CLASS_ACCURACY_LINE}`).style('opacity', 0);
+  d3.selectAll(`.${CLASS_LOSS_LINE}`).style('opacity', 0);
+}
+
+function getBoxLinePoint(
+  d: RoundBoxPlotData,
+  xScale: d3.ScaleBand<string>,
+  yScale: d3.ScaleLinear<number, number>,
+  xOffset = 0,
+  chooseAccuracy = true
+): Point {
+  return {
+    x: (xScale(d.round) as number) + xOffset,
+    y: chooseAccuracy ? yScale(d.accuracyQuantiles[1]) : yScale(d.lossQuantiles[1])
+  };
+}
+
 /**
  * 计算绘制 boxplot 关键数据：quantiles, median, min and max
  * @param plainDataArray lossArray or accuracyArray
@@ -73,6 +118,9 @@ function getRoundBoxPlotDataArray(data: Performance): RoundBoxPlotData[] {
  * @param data
  */
 function drawBoxPlotChart(divEle: HTMLDivElement, data: RoundBoxPlotData[]) {
+  if (data.length === 0) {
+    return;
+  }
   d3.select(divEle)
     .select('svg')
     .remove();
@@ -127,8 +175,10 @@ function drawBoxPlotChart(divEle: HTMLDivElement, data: RoundBoxPlotData[]) {
     .attr('transform', `translate(${margin.left}, 0)`)
     .call(d3.axisLeft(accuracyY));
 
+  // 添加分组，为后期显隐做准备
+  const accuracyG = svg.append('g').attr('class', CLASS_ACCURACY_G);
   // 画 accuracy 竖线
-  svg
+  accuracyG
     .selectAll()
     .data(data)
     .enter()
@@ -139,7 +189,7 @@ function drawBoxPlotChart(divEle: HTMLDivElement, data: RoundBoxPlotData[]) {
     .attr('y2', (d) => accuracyY(d.accuracyRange[1]))
     .attr('stroke', BOX_STROKE_COLOR);
   // 画 accuracy 盒子
-  svg
+  accuracyG
     .selectAll()
     .data(data)
     .enter()
@@ -151,7 +201,7 @@ function drawBoxPlotChart(divEle: HTMLDivElement, data: RoundBoxPlotData[]) {
     .attr('stroke', BOX_STROKE_COLOR)
     .attr('fill', 'white');
   // 画 accuracy median 横线
-  svg
+  accuracyG
     .selectAll()
     .data(data)
     .enter()
@@ -161,9 +211,26 @@ function drawBoxPlotChart(divEle: HTMLDivElement, data: RoundBoxPlotData[]) {
     .attr('x2', (d) => (x(d.round) as number) - INTERVAL / 2)
     .attr('y2', (d) => accuracyY(d.accuracyQuantiles[1]))
     .attr('stroke', BOX_STROKE_COLOR);
+
+  // 画 accuracy 曲线
+  let startAccuracyPoint = getBoxLinePoint(data[0], x, accuracyY, -INTERVAL / 2);
+  for (let i = 1; i < data.length; i++) {
+    let endAccuracyPoint = getBoxLinePoint(data[i], x, accuracyY, -INTERVAL / 2 - BOX_WIDTH);
+    accuracyG
+      .append('line')
+      .attr('class', CLASS_ACCURACY_LINE)
+      .attr('x1', startAccuracyPoint.x)
+      .attr('y1', startAccuracyPoint.y)
+      .attr('x2', endAccuracyPoint.x)
+      .attr('y2', endAccuracyPoint.y)
+      .attr('stroke', BOX_STROKE_COLOR)
+      .style('opacity', 0);
+    startAccuracyPoint = getBoxLinePoint(data[i], x, accuracyY, -INTERVAL / 2);
+  }
+
   // 画 accuracy min 和 max 横线
   for (let i = 0; i < 2; i++) {
-    svg
+    accuracyG
       .selectAll()
       .data(data)
       .enter()
@@ -185,8 +252,11 @@ function drawBoxPlotChart(divEle: HTMLDivElement, data: RoundBoxPlotData[]) {
     .attr('transform', `translate(${margin.left + width}, 0)`)
     .call(d3.axisRight(lossY));
 
+  // 添加分组，为后期显隐做准备
+  const lossG = svg.append('g').attr('class', CLASS_LOSS_G);
+
   // 画 loss 竖线
-  svg
+  lossG
     .selectAll()
     .data(data)
     .enter()
@@ -197,7 +267,7 @@ function drawBoxPlotChart(divEle: HTMLDivElement, data: RoundBoxPlotData[]) {
     .attr('y2', (d) => lossY(d.lossRange[1]))
     .attr('stroke', BOX_STROKE_COLOR);
   // 画 loss 盒子
-  svg
+  lossG
     .selectAll()
     .data(data)
     .enter()
@@ -209,7 +279,7 @@ function drawBoxPlotChart(divEle: HTMLDivElement, data: RoundBoxPlotData[]) {
     .attr('stroke', BOX_STROKE_COLOR)
     .attr('fill', 'white');
   // 画 loss median 横线
-  svg
+  lossG
     .selectAll()
     .data(data)
     .enter()
@@ -219,9 +289,24 @@ function drawBoxPlotChart(divEle: HTMLDivElement, data: RoundBoxPlotData[]) {
     .attr('x2', (d) => (x(d.round) as number) + INTERVAL / 2 + BOX_WIDTH)
     .attr('y2', (d) => lossY(d.lossQuantiles[1]))
     .attr('stroke', BOX_STROKE_COLOR);
+  // 画 loss 曲线
+  let startLossPoint = getBoxLinePoint(data[0], x, lossY, INTERVAL / 2 + BOX_WIDTH, false);
+  for (let i = 1; i < data.length; i++) {
+    let endLossPoint = getBoxLinePoint(data[i], x, lossY, INTERVAL / 2, false);
+    lossG
+      .append('line')
+      .attr('class', CLASS_LOSS_LINE)
+      .attr('x1', startLossPoint.x)
+      .attr('y1', startLossPoint.y)
+      .attr('x2', endLossPoint.x)
+      .attr('y2', endLossPoint.y)
+      .attr('stroke', BOX_STROKE_COLOR)
+      .style('opacity', 0);
+    startLossPoint = getBoxLinePoint(data[i], x, lossY, INTERVAL / 2 + BOX_WIDTH, false);
+  }
   // 画 loss min 和 max 横线
   for (let i = 0; i < 2; i++) {
-    svg
+    lossG
       .selectAll()
       .data(data)
       .enter()
@@ -232,6 +317,18 @@ function drawBoxPlotChart(divEle: HTMLDivElement, data: RoundBoxPlotData[]) {
       .attr('y2', (d) => lossY(d.lossRange[i]))
       .attr('stroke', BOX_STROKE_COLOR);
   }
+
+  // 监听显隐
+  accuracyG
+    .on('mouseover', () => {
+      mouseOver(true);
+    })
+    .on('mouseout', mouseOut);
+  lossG
+    .on('mouseover', () => {
+      mouseOver(false);
+    })
+    .on('mouseout', mouseOut);
 }
 
 export default function(props: BoxPlotProps): JSX.Element {
