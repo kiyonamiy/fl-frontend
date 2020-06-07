@@ -83,6 +83,7 @@ export default function(props: ControlPanelProps): JSX.Element {
         style={{ width: 70 }}
         onClick={() => {
           props.setAuto(!props.auto);
+          props.displayRoundInputChange(parseInt(displayInput, 10));
         }}
       />
     </div>
