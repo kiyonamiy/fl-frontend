@@ -6,6 +6,12 @@ export function sumBoolean(a: boolean[]): number {
     return a.reduce((prev: number, cur) => prev +((cur === true) ? 1 : 0), 0);
 }
 
+/**
+ * 对数组进行采样，fix为一定会被选中的id
+ * @param larger 
+ * @param sample 
+ * @param fix 
+ */
 export function sampleToFix(larger: number, sample: number, fix?: number): number[] {
     const res = [];
     if (larger <= sample) {

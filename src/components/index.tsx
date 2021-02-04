@@ -12,7 +12,7 @@ import { BarChartPane } from './client/bar-chart';
 import { SpacePane } from './space';
 import { UtilsPane } from './utils';
 import { GradientPane } from './gradient';
-
+import { HistoryPane } from './history';
 export default function AppPane(): JSX.Element {
   return (
     <div>
@@ -27,13 +27,13 @@ export default function AppPane(): JSX.Element {
       <div className="Frame ClientView">
         <Client />
       </div>
+      <HistoryPane />
       <SpacePane />
-      <div className="Frame ModelView">
+      {/* <div className="Frame ModelView">
         <ModelInfo />
-      </div>
+      </div> */}
       <div className="Frame GradientView">Gradient</div>
       <GradientPane />
-      <div className="Frame ModelView">Model</div>
       <UtilsPane />
     </div>
   );

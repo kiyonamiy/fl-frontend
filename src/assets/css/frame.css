@@ -9,20 +9,29 @@
   color: black;
 }
 
+.Frame.HistoryView {
+  position: absolute;
+  display: flex;
+  left: 5px;
+  top: 5px;
+  width: 1960px;
+  height: 150px;
+}
+
 .Frame.ClientView {
   position: absolute;
   left: 5px;
-  top: 5px;
+  top: 160px;
   width: 700px;
-  height: 715px;
+  height: 815px;
 }
 
 .Frame.SpaceView {
   position: absolute;
   left: 710px;
-  top: 5px;
+  top: 160px;
   width: 1255px;
-  height: 715px;
+  height: 565px;
 }
 
 .Frame.ModelView {
@@ -35,8 +44,8 @@
 
 .Frame.GradientView {
   position: absolute;
-  left: 510px;
+  left: 710px;
   top: 725px;
-  width: 1405px;
+  width: 1255px;
   height: 350px;
 }

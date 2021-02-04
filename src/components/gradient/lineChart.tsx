@@ -16,9 +16,9 @@ function LineChartPaneBase(props: LineChartProps): JSX.Element {
     useEffect(() => {
       if (props.data.length <= 0)
         return;
-      const width = 1000,
-            height = 180;
-      const margin = {top: 20, left: 50, right: 20, bottom: 20};
+      const width = 1155,
+            height = 170;
+      const margin = {top: 10, left: 50, right: 20, bottom: 20};
 
       const allNum = props.layersNum.reduce((prev, cur) => prev + cur, 0);
       const xValue: number[] = [];

@@ -3,13 +3,14 @@ import * as d3 from 'd3';
 import { ActionHandler, createDispatchHandler } from '../../actions/redux-action';
 import { SpaceAction, UtilsAction } from '../../actions';
 import { connect } from 'react-redux';
-import { State, Heatmap, MetricValue, SpaceType } from '../../types';
+import { State, Heatmap, MetricValue, SpaceType, HistoryValue } from '../../types';
 
 import './heatmap.css';
 import { sumBoolean } from '../utils/math';
 import { getSpaceRound, getEndRound } from '../utils/selector';
 import { sampleToFix } from '../utils/math';
 import { SubHeatmapPane } from './subHeatmap';
+import { HEATMAP_WIDTH } from './constant';
 
 export interface HeatMapProps extends ActionHandler<SpaceAction | UtilsAction> {
   round: number,
@@ -23,45 +24,36 @@ const anomalyColorMap = d3.scaleLinear<string>().domain([0,1]).range(['white', '
 const contributionColorMap = d3.scaleLinear<string>().domain([-1, 1]).range(['white', '#c96f32']);
 function HeatmapPaneBase(props: HeatMapProps): JSX.Element {
   const {clients, heatmap, anomalyFilter, contributionFilter, round, allRound} = props;
-  const anomalyData: MetricValue[] = [];
-  const contributData: MetricValue[] = [];
+  const anomalyData: HistoryValue[] = [];
+  const contributeData: HistoryValue[] = [];
   const anomalyNum = Math.max(1, sumBoolean(anomalyFilter));
   const contributionNum = Math.max(1, sumBoolean(contributionFilter));
   if (heatmap.length === 0 || clients.length === 0)
     return <div></div>;
 
-  clients.forEach(id => {
-    if (heatmap[id].id !== id) {
-      console.assert('index of heatmap is unequal to property of idx!');
-    }
-    const vector = [];
-    for (let roundIndex = 0; roundIndex < allRound; roundIndex++) {
-      let element = 0;
-      heatmap[id].anomaly.forEach((v, typeIndex) => {
+  const clientNum = heatmap.length;
+  for (let roundIndex = 0; roundIndex < allRound; roundIndex++) {
+    let curAnomaly = 0;
+    let curContribute = 0;
+    for (let clientIdx = 0; clientIdx < clientNum; clientIdx++) {
+      heatmap[clientIdx].anomaly.forEach((v, typeIndex) => {
         if (anomalyFilter[typeIndex] === true)
-          element += v[roundIndex];
+          curAnomaly += v[roundIndex];
+      });
+      anomalyData.push({
+        round: roundIndex,
+        value: curAnomaly / anomalyNum
+      });
+      heatmap[clientIdx].contribution.forEach((v, typeIndex) => {
+        if (contributionFilter[typeIndex] === true)
+        curContribute += v[roundIndex];
       })
-      vector.push(element / anomalyNum);
+      contributeData.push({
+        round: roundIndex,
+        value: curContribute / contributionNum
+      });
     }
-    anomalyData.push({
-      id: id,
-      vector: vector
-    });
-    const cVector = [];
-    for (let roundIndex = 0; roundIndex < allRound; roundIndex++) {
-      let element = 0;
-      heatmap[id].anomaly.forEach((v, typeIndex) => {
-        if (anomalyFilter[typeIndex] === true)
-          element += v[roundIndex];
-      })
-      cVector.push(element / contributionNum);
-    }
-    contributData.push({
-      id: id,
-      vector: cVector
-    });
-  });
-
+  }
   const sample = sampleToFix(allRound, 100, round);
   const stringSample: string[] = [];
   let roundIndex = 0;
@@ -75,13 +67,14 @@ function HeatmapPaneBase(props: HeatMapProps): JSX.Element {
     }
   });
   const x = d3.scaleBand()
-      .range([0, 1000])
+      .range([0, HEATMAP_WIDTH])
       .domain(stringSample)
       .padding(0.1);
   const stepWidth = x.bandwidth();
   const roundLeft: string = (x(stringSample[roundIndex]) as any) + stepWidth / 2 - 40 + 'px';
   return (
     <div className='heatmap-div'>
+      <div className='subtitle-div'> History</div>
       <SubHeatmapPane 
         data={anomalyData}
         round={round}
@@ -99,7 +92,7 @@ function HeatmapPaneBase(props: HeatMapProps): JSX.Element {
         </p>
       </div>
       <SubHeatmapPane 
-        data={contributData}
+        data={contributeData}
         round={round}
         roundIndex={roundIndex}
         stringSample={stringSample}

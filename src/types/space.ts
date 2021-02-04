@@ -3,6 +3,20 @@ export interface MetricValue {
     vector: number[]
 };
 
+export interface VectorRange {
+    min: number,
+    max: number
+};
+
+export interface Position {
+    x: number,
+    y: number
+};
+export interface HistoryValue {
+    round: number,
+    value: number
+};
+
 export enum SpaceType {
     Anomaly = 0,
     Contribution
@@ -64,6 +78,7 @@ export const DEFAULT_SPACE: Space = {
         scale: DEFAULT_CONTRIBUTION_SCALE,
         value: []
     },
+    // anomaly + contribution
     concat: [],
     anomalyFilter: [true, true, true, true, true, true],
     contributionFilter: [true, true, true, true],

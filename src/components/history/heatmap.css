@@ -1,12 +1,18 @@
+.subtitle-div {
+    height: 20px;
+    line-height: 20px;
+    margin: 5px 0;
+    font-size: 18px;
+}
+
 .heatmap-div {
-    height: 380px;
     margin: 5px;
-    width: 1245px;
+    width: 100%;
 }
 
 .heatmap-round-div {
     position: relative;
-    left: 200px;
+    left: 100px;
     height: 20px;
 }
 
@@ -18,16 +24,17 @@
 }
 
 .sub-heatmap-div {
-    height: 170px;
-    width: 1250px;
+    height: 40px;
+    width: 100%;
     display: flex;
 }
 
 .sub-heatmap-title {
     width: 100px;
     height: 100%;
+    line-height: 100%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     flex-direction: column;
     font-size: 14px;
@@ -45,17 +52,13 @@
     font-weight: normal;
 }
 
-.sub-heatmap-round p {
-    width: 100%;
-}
-
 .sub-heatmap-round p:hover {
     cursor: pointer;
 }
 
 .sub-heatmap-svg {
-    width: 1000px;
-    height: 170px;
+    width: 1580px;
+    height: 100%;
 }
 
 .sub-heatmap-svg rect:hover {
