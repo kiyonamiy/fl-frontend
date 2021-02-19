@@ -1,5 +1,5 @@
 import {Client} from './client';
-import {Space} from './space';
+import {Analysis} from './space';
 import {ModelInformation} from './model';
 import { Utils } from './utils';
 import { Gradient } from './gradient';
@@ -14,7 +14,7 @@ export * from './gradient';
  */
 export interface State {
     Client: Client,
-    Space: Space,
+    Space: Analysis,
     Model: ModelInformation,
     Utils: Utils,
     Gradient: Gradient

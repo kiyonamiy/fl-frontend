@@ -8,5 +8,4 @@ export const getSpaceRound = (state: State) => state.Space.round;
 export const getEndRound = (state: State) => state.Client.latestRound;
 export const getAnomaly = (state: State) => state.Space.anomaly;
 export const getSpaceK = (state: State) => state.Space.K;
-export const getHeatMap = (state: State) => state.Space.heatmap;
 export const getAnomalyFilter = (state: State) => state.Space.anomalyFilter;

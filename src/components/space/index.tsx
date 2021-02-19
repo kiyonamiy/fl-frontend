@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { State, Space, SpaceType } from '../../types';
+import { State, Analysis, SpaceType } from '../../types';
 import { createDispatchHandler, ActionHandler } from "../../actions/redux-action";
 import { SpaceAction, SET_MODEL_LAYERS, ModelAction } from '../../actions';
 import { ParallelPane } from './parallel';
 
 import './space.css';
-import { ProjectionPane } from './projection';
+// import { ProjectionPane } from './projection';
 export interface SpaceProps extends ActionHandler<SpaceAction | ModelAction> {
   curRound: number,
-  space: Space
+  space: Analysis
 };
 function SpacePaneBase(props: SpaceProps): JSX.Element {
   useEffect(() => {
@@ -35,11 +35,11 @@ function SpacePaneBase(props: SpaceProps): JSX.Element {
             width={250}
             color='#69b3a2'
           /> */}
-          <ProjectionPane
+          {/* <ProjectionPane
             data={props.space.concat}
             anomalyFilter={props.space.anomalyFilter}
             contributionFilter={props.space.contributionFilter}
-          />
+          /> */}
           {/* <ParallelPane 
             title='Anomaly Space'
             id={SpaceType.Anomaly}

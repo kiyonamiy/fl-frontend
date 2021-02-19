@@ -1,5 +1,5 @@
 import { ReduxAction } from "./redux-action";
-import { Parallel, MetricValue, Heatmap } from "../types";
+import { Metric, MetricValue, Heatmap } from "../types";
 
 export type SpaceAction = (SetAnomalySpace | SetContributionSpace | SetConcatSpace
     | SetAnomalyFilter | SetContributionFilter | SetSpaceTopK | SetSpaceRound
@@ -7,12 +7,12 @@ export type SpaceAction = (SetAnomalySpace | SetContributionSpace | SetConcatSpa
 
 export const SET_ANOMALY_SPACE = 'SET_ANOMALY_SPACE';
 export type SetAnomalySpace = ReduxAction<typeof SET_ANOMALY_SPACE, {
-    anomaly: Parallel
+    anomaly: Metric
 }>;
 
 export const SET_CONTRIBUTION_SPACE = 'SET_CONTRIBUTION_SPACE';
 export type SetContributionSpace = ReduxAction<typeof SET_CONTRIBUTION_SPACE, {
-    contribution: Parallel
+    contribution: Metric
 }>;
 
 export const SET_ANOMALY_FILTER = 'SET_ANOMALY_FILTER';

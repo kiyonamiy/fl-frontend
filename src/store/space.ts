@@ -1,7 +1,7 @@
-import { Space, DEFAULT_SPACE } from "../types";
-import { SpaceAction, SET_ANOMALY_SPACE, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE, SET_ANOMALY_FILTER, SET_CONTRIBUTION_FILTER, SET_SPACE_TOP_K, SET_SPACE_HEATMAP, SET_SPACE_ROUND, SET_LASSO_CLIENTS } from "../actions";
+import { Analysis, DEFAULT_ANALYSIS } from "../types";
+import { SpaceAction, SET_ANOMALY_SPACE, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE, SET_ANOMALY_FILTER, SET_CONTRIBUTION_FILTER, SET_SPACE_TOP_K, SET_SPACE_ROUND, SET_LASSO_CLIENTS } from "../actions";
 
-export const spaceReducer = (state: Space = DEFAULT_SPACE, action: SpaceAction): Space => {
+export const analysisReducer = (state: Analysis = DEFAULT_ANALYSIS, action: SpaceAction): Analysis => {
     switch (action.type) {
         case SET_SPACE_ROUND:
             return {...state, round: action.payload.round};
@@ -17,8 +17,6 @@ export const spaceReducer = (state: Space = DEFAULT_SPACE, action: SpaceAction):
             return {...state, clients: action.payload.clients.concat(), savedClients: action.payload.clients.concat()};
         case SET_CONTRIBUTION_FILTER:
             return {...state, contributionFilter: action.payload.filter};
-        case SET_SPACE_HEATMAP:
-            return {...state, heatmap: action.payload.heatmap};
         case SET_LASSO_CLIENTS:
             return {
                 ...state, 

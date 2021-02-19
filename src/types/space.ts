@@ -3,11 +3,6 @@ export interface MetricValue {
     vector: number[]
 };
 
-export interface VectorRange {
-    min: number,
-    max: number
-};
-
 export interface Position {
     x: number,
     y: number
@@ -26,10 +21,10 @@ export interface ClientValue {
     value: number
 };
 
-export interface Parallel {
+export interface Metric {
     metrics: string[],
     scale: number[][],
-    value: MetricValue[]
+    value: MetricValue[],
 };
 
 export const DEFAULT_CONTRIBUTION_METRICS = ['Gradient-eu', 'Gradient-cos', 'Performance-accuracy', 'Performance-loss'];
@@ -38,11 +33,6 @@ export const DEFAULT_ANOMALY_METRICS = ['Krum', 'FoolsGold', 'Zeno', 'Auror', 'S
 export const DEFAULT_CONTRIBUTION_SCALE = [[0, 1], [0, 1], [-1 , 1], [-1 ,1]];
 export const DEFAULT_ANOMALY_SCALE = [[0, 1], [0, 1], [0, 1], [0, 1], [0, 1], [0, 1]];
 
-export interface Position {
-    x: number,
-    y: number
-};
-
 export interface HeatmapMetrics {
     id: number,
     anomaly: number[][],
@@ -50,20 +40,19 @@ export interface HeatmapMetrics {
 };
 export type Heatmap = HeatmapMetrics[];
 
-export type Space = {
+export type Analysis = {
     round: number,
     K: number,
     clients: number[],
     savedClients: number[],
-    anomaly: Parallel,
-    contribution: Parallel,
+    anomaly: Metric,
+    contribution: Metric,
     concat: MetricValue[],
     anomalyFilter: boolean[],
     contributionFilter: boolean[],
-    heatmap: Heatmap,
 };
 
-export const DEFAULT_SPACE: Space = {
+export const DEFAULT_ANALYSIS: Analysis = {
     round: -1,
     K: 5,
     clients: [],
@@ -71,16 +60,15 @@ export const DEFAULT_SPACE: Space = {
     anomaly: {
         metrics: DEFAULT_ANOMALY_METRICS,
         scale: DEFAULT_ANOMALY_SCALE,
-        value: []
+        value: [],
     },
     contribution: {
         metrics: DEFAULT_CONTRIBUTION_METRICS,
         scale: DEFAULT_CONTRIBUTION_SCALE,
-        value: []
+        value: [],
     },
     // anomaly + contribution
     concat: [],
     anomalyFilter: [true, true, true, true, true, true],
     contributionFilter: [true, true, true, true],
-    heatmap: []
 };

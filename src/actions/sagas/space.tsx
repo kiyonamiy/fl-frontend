@@ -2,13 +2,13 @@ import { call, put, all, takeLatest, select } from 'redux-saga/effects';
 import { SET_SPACE_ROUND, SetSpaceRound, SET_ANOMALY_SPACE, SET_CONTRIBUTION_SPACE, SET_CONCAT_SPACE, SET_ANOMALY_FILTER, SetAnomalyFilter,  SET_SPACE_TOP_K, SetSpaceTopK } from '../space';
 import { getGradient, getOneRoundMetrics } from '../../api';
 import { getLayers, getClientNum, getSpaceRound, getAnomaly, getSpaceK, getAnomalyFilter } from '../../components/utils/selector';
-import { Parallel, DEFAULT_ANOMALY_METRICS, DEFAULT_CONTRIBUTION_METRICS, DEFAULT_ANOMALY_SCALE, DEFAULT_CONTRIBUTION_SCALE, MetricValue, ClientValue, Weight } from '../../types';
+import { Metric, DEFAULT_ANOMALY_METRICS, DEFAULT_CONTRIBUTION_METRICS, DEFAULT_ANOMALY_SCALE, DEFAULT_CONTRIBUTION_SCALE, MetricValue, ClientValue, Weight } from '../../types';
 import { deepClone } from '../../components/utils/deepclone';
 import { SetGradient, SET_GRADIENT } from '../gradient';
 import { sum } from '../../components/utils/math';
 
-const transferSpaceData = (spaceRes: any, metrics: string[], scale: number[][], clientNum: number): Parallel => {
-    const res: Parallel = {
+const transferSpaceData = (spaceRes: any, metrics: string[], scale: number[][], clientNum: number): Metric => {
+    const res: Metric = {
         metrics: metrics.concat(),
         scale: scale,
         value: new Array(clientNum).fill(0).map((v, index) => {return {
@@ -27,7 +27,7 @@ const transferSpaceData = (spaceRes: any, metrics: string[], scale: number[][], 
     return res;
 }
 
-const mergeVector = (anomalyData: Parallel, contributionData: Parallel): MetricValue[] => {
+const mergeVector = (anomalyData: Metric, contributionData: Metric): MetricValue[] => {
     const res = deepClone<MetricValue[]>(anomalyData.value);
     contributionData.value.forEach((d,i) => {
       res[i].vector.push(...d.vector);
@@ -129,7 +129,7 @@ export function* watchSetSpaceRound() {
   }
 
 function* requestMetrics(action: SetAnomalyFilter): any {
-    const anomaly: Parallel = yield select(getAnomaly);
+    const anomaly: Metric = yield select(getAnomaly);
     const vector: ClientValue[] = anomaly.value.map(v => ({
         id: v.id,
         value: sum(v.vector.filter((v,i) => action.payload.filter[i]))

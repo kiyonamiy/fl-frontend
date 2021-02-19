@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import * as d3 from 'd3';
-import { State, Parallel, MetricValue, SpaceType } from '../../types';
+import { State, Metric, MetricValue, SpaceType } from '../../types';
 import { Select, OptionProps } from '../utils/select';
 
 import './parallel.css';
@@ -12,7 +12,7 @@ import { UtilsAction, SET_HIGHLIGHT_CLIENT } from '../../actions/utils';
 export interface ParallelProps extends ActionHandler<SpaceAction | UtilsAction> {
   title: string,
   id: SpaceType,
-  data: Parallel,
+  data: Metric,
   width: number,
   color: string,
 };
